@@ -91,7 +91,7 @@ public class SoundMapDialog extends SoundDatabaseDialog {
         List<String> kList = Arrays.asList(Keyboard.KEY_STRING_TABLE);
         KeyInfo info = se.getKeyInfo();
         int kc = editor.getModel().getKeyCount();
-        int baseIndex = Math.max(0, info.index) * 12;
+        int baseIndex = Math.max(0, info.index + 2) * 12;
         int key = kList.indexOf(info.key);
         int y = baseIndex + key;
         boolean invalid = key == -1 || info.index == -1;
@@ -195,7 +195,7 @@ public class SoundMapDialog extends SoundDatabaseDialog {
             long l = indexList.stream().filter((e) -> e.index == se.index).count();
             if (l >= 2) {
                 //g2.setColor(Color.RED);
-                name = "!! " + name + " !!";
+                name = "!! [" + String.join(",", indexList.stream().filter((e) -> e.index == se.index).map((e) -> e.effect.getName()).toArray(String[]::new)) + "]";
             }
             return name;
         }
