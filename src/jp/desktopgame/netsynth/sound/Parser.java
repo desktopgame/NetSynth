@@ -99,6 +99,9 @@ class Parser {
             return -1;
         }
         if (s.charAt(0) == '0') {
+            if (s.length() == 1) {
+                return 0;
+            }
             return parseInt(s.substring(1));
         }
         try {
