@@ -95,7 +95,7 @@ public class AutoRecAction extends ViewAction {
                 }
                 int vel = (int) velocitySpinner.getValue();
 
-                for (int i = 0; i < 8; i++) {
+                for (int i = 0; i < 11; i++) {
                     for (int j = 0; j < 12; j++) {
                         String chord = Keyboard.KEY_STRING_TABLE[j];
                         int key = (i * 12) + j;
