@@ -11,13 +11,9 @@ package jp.desktopgame.netsynth.sound;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -41,6 +37,8 @@ public class SoundEffect {
     private byte[] audio;
     private AudioFormat format;
     private Clip loopClip;
+    private boolean loopingContinue;
+    private final Object MUTEX = new Object();
     private static ExecutorService executor;
 
     static {
@@ -79,6 +77,48 @@ public class SoundEffect {
         loopClip.loop(Clip.LOOP_CONTINUOUSLY);
         loopClip.open(format, audio, 0, audio.length);
         loopClip.start();
+    }
+
+    public void playLoop(float peakStart, float peakEnd) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        load();
+        synchronized (MUTEX) {
+            this.loopingContinue = true;
+        }
+        this.loopClip = getClip();
+        loopClip.open(format, audio, 0, audio.length);
+        long len = loopClip.getMicrosecondLength();
+        loopClip.start();
+        loopClip.addLineListener((event) -> {
+            // ストップか最後まで再生された場合
+            if (event.getType() == LineEvent.Type.STOP) {
+                //Clip clip = (Clip) event.getSource();
+                loopClip.stop();
+                loopClip.setFramePosition(0); // 再生位置を最初に戻す
+            }
+        });
+        // 再生時間が短すぎる場合には所定の再生時間を超えた時点で停止
+        // 再生時間が長すぎる場合にはピークを繰り返す->ピーク後から最後まで流す
+        executor.submit(() -> {
+            int loops = 0;
+            while (true) {
+                try {
+                    TimeUnit.MICROSECONDS.sleep(1);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+                long posMS = loopClip.getMicrosecondPosition();
+                if (posMS >= len * peakEnd) {
+                    loopClip.stop();
+                    loopClip.setMicrosecondPosition((long) (len * peakStart));
+                    loopClip.start();
+                }
+                synchronized (MUTEX) {
+                    if (!loopingContinue) {
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     public void playLoop(long lenPlayMicroSeconds, float peakStart, float peakEnd) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
@@ -136,6 +176,9 @@ public class SoundEffect {
             loopClip.stop();
             loopClip.flush();
             loopClip.setFramePosition(0);
+        }
+        synchronized (MUTEX) {
+            this.loopingContinue = false;
         }
     }
 
