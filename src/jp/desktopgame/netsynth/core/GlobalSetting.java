@@ -237,6 +237,8 @@ public class GlobalSetting {
                     .create();
             try {
                 this.setting = gson.fromJson(new FileReader(jsonFile), GlobalSetting.class);
+                setting.getGarageBandSoundDatabase();
+                setting.getAnotherSoundDatabases();
                 propChangeListeners.forEach(setting::addPropertyChangeListener);
             } catch (FileNotFoundException ex) {
                 throw new Error(ex);
