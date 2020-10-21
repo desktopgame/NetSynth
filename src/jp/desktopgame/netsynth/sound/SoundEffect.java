@@ -181,10 +181,6 @@ public class SoundEffect {
         return keyInfo;
     }
 
-    private static boolean isKey(Character c) {
-        return Character.isAlphabetic(c) || c == '#';
-    }
-
     private String delSuffix(String filename) {
         int pos = filename.lastIndexOf(".");
         if (pos < 0) {
@@ -193,30 +189,4 @@ public class SoundEffect {
         return filename.substring(0, pos);
     }
 
-    private String parseSection(int pos, String name, Predicate<Character> pred, boolean continueIfEmpty) {
-        Stack<Character> cstack = new Stack<>();
-        for (int i = pos; i >= 0; i--) {
-            char c = name.charAt(i);
-            if (pred.test(c)) {
-                cstack.push(c);
-            } else {
-                break;
-            }
-        }
-        if (continueIfEmpty && cstack.empty()) {
-            if (pos == 0) {
-                return "";
-            }
-            return parseSection(pos - 1, name, pred, continueIfEmpty);
-        }
-        List<Character> clist = new ArrayList<>();
-        while (!cstack.empty()) {
-            clist.add(cstack.pop());
-        }
-        StringBuilder sb = new StringBuilder();
-        for (Character c : clist) {
-            sb.append(c);
-        }
-        return sb.toString();
-    }
 }
