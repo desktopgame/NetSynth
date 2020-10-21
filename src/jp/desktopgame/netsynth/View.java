@@ -20,13 +20,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import jp.desktopgame.netsynth.console.ConsolePane;
-import jp.desktopgame.netsynth.core.action.EasyRecAction;
 import jp.desktopgame.netsynth.core.action.AllLineCloseAction;
 import jp.desktopgame.netsynth.core.action.AudioSliceAction;
 import jp.desktopgame.netsynth.core.action.AutoRecAction;
 import jp.desktopgame.netsynth.core.action.CopyAction;
 import jp.desktopgame.netsynth.core.action.CopyPhraseAction;
 import jp.desktopgame.netsynth.core.action.CutAction;
+import jp.desktopgame.netsynth.core.action.EasyRecAction;
 import jp.desktopgame.netsynth.core.action.ExportAction;
 import jp.desktopgame.netsynth.core.action.GlobalSettingAction;
 import jp.desktopgame.netsynth.core.action.ImportAction;
@@ -232,6 +232,10 @@ public class View {
         if (i >= 0) {
             trackEditorPane.setTarget(workAreaPane.getSelectedTrackSetting());
         }
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     public WorkAreaPane getWorkAreaPane() {
