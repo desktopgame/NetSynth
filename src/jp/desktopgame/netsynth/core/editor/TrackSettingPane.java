@@ -293,6 +293,10 @@ public class TrackSettingPane extends JPanel {
                 .filter((e) -> e.getInfo().getName().equals(ts.getSynthesizer()))
                 .findFirst();
         if (midiCon.isPresent()) {
+            int i = softSynthCons.stream().map((e) -> e.getAlias()).collect(Collectors.toList()).indexOf(ts.getSynthesizer());
+            if (i >= 0) {
+                softSynthComboBox.setSelectedIndex(i + 1);
+            }
             scanBank(midiCon.get().getSynthesizer().get());
         }
     }
