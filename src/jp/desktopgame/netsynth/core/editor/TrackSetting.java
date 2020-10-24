@@ -36,6 +36,11 @@ public class TrackSetting {
     @GetMethod
     private boolean isMute;
     @Expose
+    @Property("ドラム")
+    @SetMethod("setDrum")
+    @GetMethod("isDrum")
+    private boolean isDrum;
+    @Expose
     @Property("ベロシティ")
     @SetMethod
     @GetMethod
@@ -69,6 +74,7 @@ public class TrackSetting {
         this.synthesizer = "Gervill";
         this.model = null;
         this.support = new PropertyChangeSupport(this);
+        this.isDrum = false;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -97,6 +103,16 @@ public class TrackSetting {
 
     public boolean isMute() {
         return isMute;
+    }
+
+    public void setDrum(boolean isDrum) {
+        boolean a = this.isDrum;
+        this.isDrum = isDrum;
+        support.firePropertyChange("isDrum", a, isDrum);
+    }
+
+    public boolean isDrum() {
+        return isDrum;
     }
 
     public void setVelocity(int velocity) {
