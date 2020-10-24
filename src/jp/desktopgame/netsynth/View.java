@@ -164,7 +164,7 @@ public class View {
         mixerMenu.add(new JMenuItem(getAction("EasyRecAction")));
         mixerMenu.add(new JMenuItem(getAction("AutoRecAction")));
         JMenu soundMenu = new JMenu("サウンド(S)");
-        soundMenu.add(new JMenuItem(getAction("SoundAliasAction")));
+        //soundMenu.add(new JMenuItem(getAction("SoundAliasAction")));
         soundMenu.add(new JMenuItem(getAction("KeyMapAction")));
         soundMenu.add(new JMenuItem(getAction("AudioSliceAction")));
         soundMenu.setMnemonic('S');
