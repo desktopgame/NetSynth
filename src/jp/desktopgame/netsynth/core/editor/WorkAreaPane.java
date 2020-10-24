@@ -117,7 +117,7 @@ public class WorkAreaPane extends JPanel {
             PianoRollModel model = editor.getPianoRoll().getModel();
             editor.getPianoRollLayerUI().playSequence();
             VirtualMidiSequencer vseq = new RealtimeMidiSequencer(editor.getPianoRollLayerUI(), ts);
-            MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.getBank(), ts.getProgram(), true);
+            MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram(), true);
             MidiPlayerDependency<PianoRollModel> dep = new MidiPlayerDependency<>(ts.getSynthesizer(), model, setting);
             midiPlayer.addDependency(dep);
 

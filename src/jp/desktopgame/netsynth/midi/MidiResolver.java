@@ -80,9 +80,18 @@ public class MidiResolver<T> {
             List<MidiPlayerDependency<T>> otherSettings = settings.stream().filter((e) -> e.synthesizer.equals(k)).collect(Collectors.toList());
             Synthesizer synthesizer = controllerOpt.get().getSynthesizer().get();
             // 全てにチャンネルを割り当てる
+            boolean usedDrum = false;
             for (int i = 0; i < otherSettings.size(); i++) {
+                int channelIndex = i;
                 MidiPlayerDependency<T> os = otherSettings.get(i);
-                MidiChannel channel = synthesizer.getChannels()[i];
+                if (usedDrum && channelIndex >= 9) {
+                    channelIndex++;
+                }
+                if (os.setting.isDrum) {
+                    channelIndex = 9;
+                    usedDrum = true;
+                }
+                MidiChannel channel = synthesizer.getChannels()[channelIndex];
                 MidiPlayer player = new MidiChannelPlayer(channel);
                 try {
                     player.setup(os.setting, eventFactory.create(os.userObject, i, timebase, beatWidth, bpm), timebase, bpm);

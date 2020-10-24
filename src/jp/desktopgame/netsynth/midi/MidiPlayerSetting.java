@@ -24,6 +24,10 @@ public class MidiPlayerSetting {
      */
     public final boolean isMute;
     /**
+     * ドラムなら true.
+     */
+    public final boolean isDrum;
+    /**
      * 使用するバンク番号.
      */
     public final int bank;
@@ -36,9 +40,10 @@ public class MidiPlayerSetting {
      */
     public final boolean sync;
 
-    public MidiPlayerSetting(VirtualMidiSequencer virtualMidiSequencer, boolean isMute, int bank, int program, boolean sync) {
+    public MidiPlayerSetting(VirtualMidiSequencer virtualMidiSequencer, boolean isMute, boolean isDrum, int bank, int program, boolean sync) {
         this.virtualMidiSequencer = virtualMidiSequencer;
         this.isMute = isMute;
+        this.isDrum = isDrum;
         this.bank = bank;
         this.program = program;
         this.sync = sync;
