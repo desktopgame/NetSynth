@@ -72,20 +72,6 @@ public class MidiDeviceManager {
         for (MidiDevice.Info info : infos) {
             try {
                 MidiDevice device = MidiSystem.getMidiDevice(info);
-                if (device instanceof Synthesizer) {
-                    Synthesizer ss = (Synthesizer) device;
-                    Soundbank sb = ss.getDefaultSoundbank();
-                    SoundbankResource[] resources = sb.getResources();
-                    //logDebug(sb.getName());
-                    for (SoundbankResource sr : resources) {
-                        Class<?> dataclass = sr.getDataClass();
-                        //logDebug("  " + sr.getName() + " " + (dataclass == null ? "undefined" : dataclass.getName()));
-                    }
-                    for (Instrument is : sb.getInstruments()) {
-                        Patch patch = is.getPatch();
-                        //logDebug(is + "  " + patch.getBank() + "." + patch.getProgram());
-                    }
-                }
                 String alias = info.getName();
                 String basename = new String(alias.toCharArray());
                 int c = 1;
