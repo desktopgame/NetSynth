@@ -171,6 +171,13 @@ public class GlobalSetting {
         return anotherSoundDatabase;
     }
 
+    public List<Optional<SoundDatabase>> getAllSoundDatabases() {
+        List<Optional<SoundDatabase>> ret = new ArrayList<>();
+        ret.add(getGarageBandSoundDatabase());
+        ret.addAll(getAnotherSoundDatabases());
+        return ret;
+    }
+
     public PhraseList getPhraseList() {
         return phraseList;
     }

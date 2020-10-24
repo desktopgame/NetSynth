@@ -18,7 +18,6 @@ import javax.sound.midi.Patch;
 import javax.sound.midi.Soundbank;
 import javax.sound.midi.SoundbankResource;
 import javax.sound.midi.Synthesizer;
-import static jp.desktopgame.netsynth.NetSynth.logDebug;
 import static jp.desktopgame.netsynth.NetSynth.logException;
 
 /**
@@ -77,14 +76,14 @@ public class MidiDeviceManager {
                     Synthesizer ss = (Synthesizer) device;
                     Soundbank sb = ss.getDefaultSoundbank();
                     SoundbankResource[] resources = sb.getResources();
-                    logDebug(sb.getName());
+                    //logDebug(sb.getName());
                     for (SoundbankResource sr : resources) {
                         Class<?> dataclass = sr.getDataClass();
-                        logDebug("  " + sr.getName() + " " + (dataclass == null ? "undefined" : dataclass.getName()));
+                        //logDebug("  " + sr.getName() + " " + (dataclass == null ? "undefined" : dataclass.getName()));
                     }
                     for (Instrument is : sb.getInstruments()) {
                         Patch patch = is.getPatch();
-                        logDebug(is + "  " + patch.getBank() + "." + patch.getProgram());
+                        //logDebug(is + "  " + patch.getBank() + "." + patch.getProgram());
                     }
                 }
                 String alias = info.getName();

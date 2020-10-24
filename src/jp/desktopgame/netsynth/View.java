@@ -45,17 +45,17 @@ import jp.desktopgame.netsynth.core.action.RedoAction;
 import jp.desktopgame.netsynth.core.action.SaveAction;
 import jp.desktopgame.netsynth.core.action.SaveAsAction;
 import jp.desktopgame.netsynth.core.action.SavePhraseAction;
+import jp.desktopgame.netsynth.core.action.SoundAliasAction;
 import jp.desktopgame.netsynth.core.action.SoundDatabaseControlPanelAction;
 import jp.desktopgame.netsynth.core.action.StopAction;
 import jp.desktopgame.netsynth.core.action.UndoAction;
 import jp.desktopgame.netsynth.core.action.VersionAction;
 import jp.desktopgame.netsynth.core.editor.ActionTable;
 import jp.desktopgame.netsynth.core.editor.TrackChangeEvent;
-import jp.desktopgame.netsynth.core.editor.TrackSetting;
+import jp.desktopgame.netsynth.core.editor.TrackSettingPane;
 import jp.desktopgame.netsynth.core.editor.WorkAreaPane;
 import jp.desktopgame.netsynth.core.project.ProjectModifyEvent;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
-import jp.desktopgame.pec.BeanEditorPane;
 
 /**
  *
@@ -71,9 +71,9 @@ public class View {
     private JPanel leftPanel;
     private JPanel topPanel;
     private JPanel bottomPanel;
+    private TrackSettingPane trackSettingPane;
     private WorkAreaPane workAreaPane;
     private ConsolePane consolePane;
-    private BeanEditorPane<TrackSetting> trackEditorPane;
     private ActionTable<View> actionTable;
 
     /* package private */ View() {
@@ -88,9 +88,8 @@ public class View {
         this.hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, vSplit);
         this.workAreaPane = new WorkAreaPane();
         this.consolePane = new ConsolePane();
-        this.trackEditorPane = new BeanEditorPane<>(TrackSetting.class);
-        trackEditorPane.setImmediate(true);
         this.actionTable = new ActionTable(this);
+        this.trackSettingPane = new TrackSettingPane();
         ProjectSetting.Context.getInstance().addProjectModifyListener(this::projectModified);
         workAreaPane.addTrackChangeListener(this::trackChanged);
         actionTable.register(NewAction.class);
@@ -119,6 +118,7 @@ public class View {
         actionTable.register(AllLineCloseAction.class);
         actionTable.register(EasyRecAction.class);
         actionTable.register(AutoRecAction.class);
+        actionTable.register(SoundAliasAction.class);
         actionTable.register(KeyMapAction.class);
         actionTable.register(AudioSliceAction.class);
         actionTable.register(VersionAction.class);
@@ -164,6 +164,7 @@ public class View {
         mixerMenu.add(new JMenuItem(getAction("EasyRecAction")));
         mixerMenu.add(new JMenuItem(getAction("AutoRecAction")));
         JMenu soundMenu = new JMenu("サウンド(S)");
+        soundMenu.add(new JMenuItem(getAction("SoundAliasAction")));
         soundMenu.add(new JMenuItem(getAction("KeyMapAction")));
         soundMenu.add(new JMenuItem(getAction("AudioSliceAction")));
         soundMenu.setMnemonic('S');
@@ -203,7 +204,7 @@ public class View {
 
     /* package private */ void show() {
         buildActions();
-        leftPanel.add(trackEditorPane, BorderLayout.CENTER);
+        leftPanel.add(trackSettingPane, BorderLayout.CENTER);
         topPanel.add(workAreaPane, BorderLayout.CENTER);
         bottomPanel.add(consolePane, BorderLayout.CENTER);
         rootPane.add(toolBar, BorderLayout.NORTH);
@@ -230,7 +231,7 @@ public class View {
     private void trackChanged(TrackChangeEvent e) {
         int i = workAreaPane.getSelectedTrackIndex();
         if (i >= 0) {
-            trackEditorPane.setTarget(workAreaPane.getSelectedTrackSetting());
+            trackSettingPane.setTarget(workAreaPane.getSelectedTrackSetting());
         }
     }
 

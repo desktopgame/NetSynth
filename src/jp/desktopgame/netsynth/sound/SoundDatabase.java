@@ -15,7 +15,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * サウンドをカテゴリ分けして階層毎に保存するデータベースです.
@@ -24,9 +27,11 @@ import java.util.List;
  */
 public class SoundDatabase {
 
+    private SoundDatabase parent;
     private File directory;
     private List<SoundDatabase> subdatabse;
     private List<SoundEffect> effects;
+    private static Map<String, SoundDatabase> sdbMap = new HashMap<>();
 
     private SoundDatabase(File directory) {
         this.directory = directory;
@@ -37,7 +42,15 @@ public class SoundDatabase {
     public static SoundDatabase create(File rootDir) {
         SoundDatabase sdb = new SoundDatabase(rootDir);
         loadRec(sdb);
+        sdbMap.put(rootDir.getPath(), sdb);
         return sdb;
+    }
+
+    public static Optional<SoundDatabase> get(String path) {
+        if (sdbMap.containsKey(path)) {
+            return Optional.of(sdbMap.get(path));
+        }
+        return Optional.empty();
     }
 
     private static void loadRec(SoundDatabase sdb) {
@@ -45,6 +58,7 @@ public class SoundDatabase {
             if (file.isDirectory()) {
                 Path path = Paths.get(sdb.directory.getPath(), file.getName());
                 SoundDatabase childSdb = new SoundDatabase(path.toFile());
+                childSdb.parent = sdb;
                 sdb.subdatabse.add(childSdb);
                 loadRec(childSdb);
             } else {
@@ -113,6 +127,35 @@ public class SoundDatabase {
 
     public String getName() {
         return directory.getName();
+    }
+
+    public List<SoundDatabase> getIncludedSubDatabases(boolean includeSelf) {
+        List<SoundDatabase> ret = new ArrayList<>();
+        if (includeSelf) {
+            ret.add(this);
+        }
+        getIncludedSubDatabasesImpl(this, ret);
+        return ret;
+    }
+
+    private void getIncludedSubDatabasesImpl(SoundDatabase parent, List<SoundDatabase> dest) {
+        for (SoundDatabase sdb : parent.subdatabse) {
+            dest.add(sdb);
+            getIncludedSubDatabasesImpl(sdb, dest);
+        }
+    }
+
+    public String getFullName() {
+        StringBuilder sb = new StringBuilder();
+        SoundDatabase parent = this;
+        do {
+            sb.append(parent.getName());
+            parent = parent.parent;
+            if (parent != null) {
+                sb.append("/");
+            }
+        } while (parent != null);
+        return sb.toString();
     }
 
 }

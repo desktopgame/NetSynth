@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import jp.desktopgame.pec.GetMethod;
 import jp.desktopgame.pec.Property;
+import jp.desktopgame.pec.Separator;
 import jp.desktopgame.pec.SetMethod;
 import jp.desktopgame.prc.PianoRollModel;
 
@@ -24,6 +25,7 @@ import jp.desktopgame.prc.PianoRollModel;
 public class TrackSetting {
 
     @Expose
+    @Separator("トラック設定")
     @Property("名前")
     @SetMethod
     @GetMethod
@@ -49,7 +51,7 @@ public class TrackSetting {
     @GetMethod
     private int program;
     @Expose
-    @Property("シンセサイザー")
+    @Property("音源")
     @SetMethod
     @GetMethod
     private String synthesizer;

@@ -29,10 +29,10 @@ public class NetSynth {
      */
     public static void main(String[] args) {
         GlobalSetting.Context.getInstance().load();
-        applyLookAndFeel();
-        view = new View();
         MixerManager.getInstance().fetch();
         MidiDeviceManager.getInstance().fetch();
+        applyLookAndFeel();
+        view = new View();
         view.show();
     }
 

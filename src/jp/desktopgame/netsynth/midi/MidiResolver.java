@@ -13,11 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
+import jp.desktopgame.netsynth.sound.SoundDatabase;
 
 /**
  * Midiの依存関係設定から適切な{@link jp.desktopgame.netsynth.midi.MidiPlayer}を解決するクラスです.
@@ -95,8 +98,19 @@ public class MidiResolver<T> {
         // MidiDirectPlayerを使ってイベントを送信
         for (int i = 0; i < rawSettings.size(); i++) {
             final MidiPlayerDependency<T> setting = rawSettings.get(i);
-            Optional<MidiDeviceController> midiConOpt = controllers.stream().filter((e) -> e.getInfo().getName().equals(setting.synthesizer)).findFirst();
+            Optional<MidiDeviceController> midiConOpt = controllers.stream().filter((e) -> e.getReceiver().isPresent()).filter((e) -> e.getInfo().getName().equals(setting.synthesizer)).findFirst();
             if (!midiConOpt.isPresent()) {
+                final int index = i;
+                Optional<SoundDatabase> sdbOpt = SoundDatabase.get(setting.synthesizer);
+                sdbOpt.ifPresent((sdb) -> {
+                    MidiPlayer player = new MidiSEPlayer(sdb);
+                    try {
+                        player.setup(setting.setting, eventFactory.create(setting.userObject, index, timebase, beatWidth, bpm), timebase, bpm);
+                        players.add(player);
+                    } catch (InvalidMidiDataException ex) {
+                        Logger.getLogger(MidiResolver.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                });
                 continue;
             }
             MidiPlayer player = new MidiReceiverPlayer(midiConOpt.get().getReceiver().get());
