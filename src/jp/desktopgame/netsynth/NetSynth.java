@@ -75,6 +75,9 @@ public class NetSynth {
     }
 
     public static void logException(Exception e) {
+        if (view == null) {
+            return;
+        }
         if (SwingUtilities.isEventDispatchThread()) {
             view.getConsolePane().logException(e);
         } else {

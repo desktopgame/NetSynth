@@ -12,9 +12,16 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.sound.midi.Instrument;
+import javax.sound.midi.Patch;
+import javax.sound.midi.Soundbank;
+import javax.sound.midi.SoundbankResource;
+import javax.sound.midi.Synthesizer;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -51,7 +58,16 @@ public class TrackSettingPane extends JPanel {
     private DefaultComboBoxModel<String> externalSoundDetailComboBoxModel;
     private JComboBox<String> externalSoundDetailComboBox;
 
-    private JButton applyButton;
+    private DefaultComboBoxModel<String> bankComboBoxModel;
+    private JComboBox<String> bankComboBox;
+
+    private DefaultComboBoxModel<String> programComboBoxModel;
+    private JComboBox<String> programComboBox;
+    private List<Instrument> instList;
+
+    private JButton soundApplyButton;
+    private JButton programApplyButton;
+    private Map<Integer, List<Instrument>> map;
 
     private List<MidiDeviceController> controllers;
     private List<MixerController> mixers;
@@ -71,10 +87,17 @@ public class TrackSettingPane extends JPanel {
         this.externalSoundComboBox = new JComboBox<>(externalSoundComboBoxModel);
         this.externalSoundDetailComboBoxModel = new DefaultComboBoxModel<>();
         this.externalSoundDetailComboBox = new JComboBox<>(externalSoundDetailComboBoxModel);
-        this.applyButton = new JButton("適用");
+        this.bankComboBoxModel = new DefaultComboBoxModel<>();
+        this.bankComboBox = new JComboBox<>(bankComboBoxModel);
+        this.programComboBoxModel = new DefaultComboBoxModel<>();
+        this.programComboBox = new JComboBox<>(programComboBoxModel);
+        this.soundApplyButton = new JButton("適用");
+        this.programApplyButton = new JButton("適用");
         this.controllers = MidiDeviceManager.getInstance().getDeviceControllers();
         this.mixers = MixerManager.getInstance().getDevices();
         this.soundDatabases = GlobalSetting.Context.getGlobalSetting().getAllSoundDatabases().stream().filter((e) -> e.isPresent()).map((e) -> e.get()).collect(Collectors.toList());
+        this.map = new HashMap<>();
+        this.instList = new ArrayList<>();
         trackEditorPane.setImmediate(true);
         this.trackSoundPanel = new PropertyEditorPane() {
             {
@@ -84,13 +107,19 @@ public class TrackSettingPane extends JPanel {
                 addLine("ハードシンセ", hardSynthComboBox);
                 addLine("外部音源", externalSoundComboBox);
                 addLine("外部音源の詳細", externalSoundDetailComboBox);
-                addLine(applyButton);
+                addLine(soundApplyButton);
+                addLine(new JLabel("音色かんたん設定"));
+                addLine(new JSeparator());
+                addLine("バンク", bankComboBox);
+                addLine("プログラム", programComboBox);
+                addLine(programApplyButton);
                 addFooter();
             }
         };
         add(trackEditorPane, BorderLayout.NORTH);
         add(trackSoundPanel, BorderLayout.CENTER);
-        applyButton.addActionListener(this::onApply);
+        soundApplyButton.addActionListener(this::onSoundApply);
+        programApplyButton.addActionListener(this::onColorApply);
         this.softSynthCons = controllers.stream().filter((e) -> e.isSynthesizer()).collect(Collectors.toList());
         softSynthComboBoxModel.addElement("-");
         softSynthCons.stream().map((e) -> e.getAlias()).forEach(softSynthComboBoxModel::addElement);
@@ -104,6 +133,7 @@ public class TrackSettingPane extends JPanel {
         hardSynthComboBox.addItemListener(this::onSelectHardSynth);
         externalSoundComboBox.addItemListener(this::onSelectExternalSound);
         externalSoundDetailComboBox.addItemListener(this::onSelectExternalSoundDetail);
+        bankComboBox.addItemListener(this::onSelectBank);
     }
 
     private boolean chngComboBox;
@@ -156,7 +186,7 @@ public class TrackSettingPane extends JPanel {
         }
     }
 
-    private void onApply(ActionEvent e) {
+    private void onSoundApply(ActionEvent e) {
         Optional<TrackSetting> tsOpt = trackEditorPane.getTarget();
         if (!tsOpt.isPresent()) {
             return;
@@ -174,7 +204,55 @@ public class TrackSettingPane extends JPanel {
             ts.setSynthesizer(externalSoundDetailComboBox.getItemAt(exDI));
         }
         trackEditorPane.loadFromInstance(ts);
+        scanBank();
         //SwingUtilities.invokeLater(() -> NetSynth.getView().getFrame().revalidate());
+    }
+
+    private void onColorApply(ActionEvent e) {
+        int bank = Integer.valueOf((String) bankComboBox.getSelectedItem());
+        int program = programComboBox.getSelectedIndex();
+        if (program <= 0) {
+            return;
+        }
+        Optional<TrackSetting> tsOpt = getTarget();
+        if (!tsOpt.isPresent()) {
+            return;
+        }
+        Patch patch = instList.get(program - 1).getPatch();
+        TrackSetting ts = tsOpt.get();
+        ts.setBank(bank);
+        ts.setProgram(patch.getProgram());
+        trackEditorPane.loadFromInstance(ts);
+    }
+
+    private void onSelectBank(ItemEvent e) {
+        int i = bankComboBox.getSelectedIndex();
+        if (i <= 0) {
+            return;
+        }
+        int ss = softSynthComboBox.getSelectedIndex();
+        if (ss <= 0) {
+            return;
+        }
+        MidiDeviceController con = controllers.get(ss - 1);
+        if (!con.isSynthesizer()) {
+            return;
+        }
+        Synthesizer synthesizer = con.getSynthesizer().get();
+        programComboBoxModel.removeAllElements();
+        programComboBoxModel.addElement("-");
+        instList.clear();
+        int s = Integer.valueOf(bankComboBoxModel.getElementAt(i));
+        for (Instrument inst : synthesizer.getAvailableInstruments()) {
+            Patch p = inst.getPatch();
+            int bank = p.getBank();
+            if (bank != s) {
+                continue;
+            }
+            int program = p.getProgram();
+            instList.add(inst);
+            programComboBoxModel.addElement(String.valueOf(program) + " - " + inst.toString());
+        }
     }
 
     private void clearExternalSoundDetail() {
@@ -182,8 +260,41 @@ public class TrackSettingPane extends JPanel {
         externalSoundDetailComboBoxModel.addElement("-");
     }
 
+    private void scanBank() {
+        MidiDeviceController con = controllers.get(softSynthComboBox.getSelectedIndex());
+        if (!con.isSynthesizer()) {
+            return;
+        }
+        Synthesizer synthesizer = con.getSynthesizer().get();
+        scanBank(synthesizer);
+    }
+
+    private void scanBank(Synthesizer synthesizer) {
+        List<Integer> banks = new ArrayList<>();
+        bankComboBoxModel.removeAllElements();
+        bankComboBoxModel.addElement("-");
+        programComboBoxModel.removeAllElements();
+        programComboBoxModel.addElement("-");
+        for (Instrument inst : synthesizer.getAvailableInstruments()) {
+            Patch p = inst.getPatch();
+            int bank = p.getBank();
+            if (!banks.contains(bank)) {
+                banks.add(bank);
+                bankComboBoxModel.addElement(String.valueOf(bank));
+            }
+        }
+    }
+
     public void setTarget(TrackSetting ts) {
         trackEditorPane.setTarget(ts);
+        Optional<MidiDeviceController> midiCon = MidiDeviceManager.getInstance()
+                .getDeviceControllers()
+                .stream()
+                .filter((e) -> e.getInfo().getName().equals(ts.getSynthesizer()))
+                .findFirst();
+        if (midiCon.isPresent()) {
+            scanBank(midiCon.get().getSynthesizer().get());
+        }
     }
 
     public Optional<TrackSetting> getTarget() {
