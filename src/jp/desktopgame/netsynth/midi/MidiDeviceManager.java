@@ -75,7 +75,7 @@ public class MidiDeviceManager {
                 String alias = info.getName();
                 String basename = new String(alias.toCharArray());
                 int c = 1;
-                while (isTest(alias)) {
+                while (isExists(alias)) {
                     alias = basename + "." + (c++);
                 }
                 MidiDeviceController con = new MidiDeviceController(info, device, alias);
@@ -88,7 +88,7 @@ public class MidiDeviceManager {
         }
     }
 
-    private boolean isTest(String alias) {
+    private boolean isExists(String alias) {
         return deviceControllers.stream().anyMatch((e) -> e.getAlias().equals(alias));
     }
 
