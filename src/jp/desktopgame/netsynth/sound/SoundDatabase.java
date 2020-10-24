@@ -47,8 +47,24 @@ public class SoundDatabase {
     }
 
     public static Optional<SoundDatabase> get(String path) {
-        if (sdbMap.containsKey(path)) {
-            return Optional.of(sdbMap.get(path));
+        final String[] arr = path.split("/");
+        Optional<SoundDatabase> rootOpt = sdbMap.values().stream().filter((e) -> e.getName().equals(arr[0])).findFirst();
+        if (rootOpt.isPresent()) {
+            SoundDatabase ret = rootOpt.get();
+            for (int i = 1; i < arr.length; i++) {
+                final SoundDatabase retF = ret;
+                final int index = i;
+                Optional<SoundDatabase> o = retF.getSubDatabase()
+                        .stream()
+                        .filter((e) -> e.getName().equals(arr[index]))
+                        .findFirst();
+                if (o.isPresent()) {
+                    ret = o.get();
+                } else {
+                    return Optional.empty();
+                }
+            }
+            return Optional.of(ret);
         }
         return Optional.empty();
     }
