@@ -9,6 +9,8 @@
 package jp.desktopgame.netsynth;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -216,11 +218,22 @@ public class View {
         frame.pack();
         frame.setLocationRelativeTo(null);
         SwingUtilities.invokeLater(() -> {
-            hSplit.setDividerLocation(0.2);
-            vSplit.setDividerLocation(0.8);
             frame.setVisible(true);
             frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
             NetSynth.logInformation("ウィンドウの初期化が完了しました。");
+        });
+        // ウィンドウ最大化時に自動でスプリットペインの位置をいい感じに修正
+        frame.addWindowStateListener(new WindowStateListener() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                if (e.getNewState() != JFrame.MAXIMIZED_BOTH) {
+                    return;
+                }
+                SwingUtilities.invokeLater(() -> {
+                    hSplit.setDividerLocation(0.2);
+                    vSplit.setDividerLocation(0.8);
+                });
+            }
         });
     }
 
