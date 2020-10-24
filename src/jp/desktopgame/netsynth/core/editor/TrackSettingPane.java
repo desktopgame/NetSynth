@@ -171,7 +171,7 @@ public class TrackSettingPane extends JPanel {
         } else if (hardI > 0) {
             ts.setSynthesizer(hardSynthCons.get(hardI - 1).getInfo().getName());
         } else if (exI > 0 && exDI > 0) {
-            ts.setSynthesizer(externalSoundDetailComboBox.getItemAt(exDI - 1));
+            ts.setSynthesizer(externalSoundDetailComboBox.getItemAt(exDI));
         }
         trackEditorPane.loadFromInstance(ts);
         //SwingUtilities.invokeLater(() -> NetSynth.getView().getFrame().revalidate());
