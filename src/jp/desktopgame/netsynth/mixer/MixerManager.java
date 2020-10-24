@@ -72,7 +72,7 @@ public class MixerManager {
         }
     }
 
-    public List<MixerController> getDevices() {
+    public List<MixerController> getControllers() {
         return new ArrayList<>(devices);
     }
 }

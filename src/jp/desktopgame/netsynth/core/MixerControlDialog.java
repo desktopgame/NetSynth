@@ -149,7 +149,7 @@ public class MixerControlDialog extends JPanel {
     }
 
     private void reload() {
-        this.devices = new ArrayList<>(MixerManager.getInstance().getDevices());
+        this.devices = new ArrayList<>(MixerManager.getInstance().getControllers());
         deviceComboBoxModel.removeAllElements();
         Map<String, Integer> data = new HashMap<>();
         for (String name : devices.stream().map((e) -> e.getMixerName()).collect(Collectors.toList())) {

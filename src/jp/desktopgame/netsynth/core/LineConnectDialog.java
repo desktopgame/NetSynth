@@ -61,7 +61,7 @@ public class LineConnectDialog extends JPanel {
         this.openedLineList = new ArrayList<>();
         this.closedLineList = new ArrayList<>();
         // 全てのマーク状態をリセット
-        mixerMan.getDevices().stream().flatMap((e) -> e.getTargetLines().stream()).forEach((e) -> e.resetMark());
+        mixerMan.getControllers().stream().flatMap((e) -> e.getTargetLines().stream()).forEach((e) -> e.resetMark());
 
         openButton.setEnabled(false);
         closeButton.setEnabled(false);
@@ -69,7 +69,7 @@ public class LineConnectDialog extends JPanel {
         closeButton.addActionListener(this::onClose);
         mixerComboBox.addItemListener(this::onMixerSelect);
         lineComboBox.addItemListener(this::onLineSelect);
-        mixerMan.getDevices().forEach((mixerCon) -> {
+        mixerMan.getControllers().forEach((mixerCon) -> {
             mixerComboBoxModel.addElement(mixerCon.getMixerName());
         });
     }
@@ -85,7 +85,7 @@ public class LineConnectDialog extends JPanel {
     private void onOpen(ActionEvent e) {
         int i = lineComboBox.getSelectedIndex();
         if (i >= 0) {
-            MixerController mixerCon = mixerMan.getDevices().get(mixerComboBox.getSelectedIndex());
+            MixerController mixerCon = mixerMan.getControllers().get(mixerComboBox.getSelectedIndex());
             DataLineConnection line = mixerCon.getTargetLines().get(mixerCon.getTargetLineIndexFromAlias(lineComboBoxModel.getElementAt(i)));
             //AudioFormat format = new AudioFormat(SAMPLE_RATE, SAMPLE_SIZE_IN_BITS, CHANNELS, SIGNED, BIG_ENDIAN);
             //line.open(format);
@@ -100,7 +100,7 @@ public class LineConnectDialog extends JPanel {
     private void onClose(ActionEvent e) {
         int i = lineComboBox.getSelectedIndex();
         if (i >= 0) {
-            MixerController mixerCon = mixerMan.getDevices().get(mixerComboBox.getSelectedIndex());
+            MixerController mixerCon = mixerMan.getControllers().get(mixerComboBox.getSelectedIndex());
             DataLineConnection line = mixerCon.getTargetLines().get(mixerCon.getTargetLineIndexFromAlias(lineComboBoxModel.getElementAt(i)));
             line.setMark(false);
             openedLineList.remove(line);
@@ -113,7 +113,7 @@ public class LineConnectDialog extends JPanel {
     private void onMixerSelect(ItemEvent e) {
         int i = mixerComboBox.getSelectedIndex();
         if (i >= 0) {
-            MixerController mixerCon = mixerMan.getDevices().get(i);
+            MixerController mixerCon = mixerMan.getControllers().get(i);
             while (lineComboBoxModel.getSize() > 0) {
                 lineComboBoxModel.removeElementAt(0);
             }
@@ -132,7 +132,7 @@ public class LineConnectDialog extends JPanel {
     private void onLineSelect(ItemEvent e) {
         int i = lineComboBox.getSelectedIndex();
         if (i >= 0) {
-            MixerController mixerCon = mixerMan.getDevices().get(mixerComboBox.getSelectedIndex());
+            MixerController mixerCon = mixerMan.getControllers().get(mixerComboBox.getSelectedIndex());
             updateButtonState(mixerCon, i);
         }
     }

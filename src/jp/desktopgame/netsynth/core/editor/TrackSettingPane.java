@@ -94,7 +94,7 @@ public class TrackSettingPane extends JPanel {
         this.soundApplyButton = new JButton("適用");
         this.programApplyButton = new JButton("適用");
         this.controllers = MidiDeviceManager.getInstance().getDeviceControllers();
-        this.mixers = MixerManager.getInstance().getDevices();
+        this.mixers = MixerManager.getInstance().getControllers();
         this.soundDatabases = GlobalSetting.Context.getGlobalSetting().getAllSoundDatabases().stream().filter((e) -> e.isPresent()).map((e) -> e.get()).collect(Collectors.toList());
         this.map = new HashMap<>();
         this.instList = new ArrayList<>();
