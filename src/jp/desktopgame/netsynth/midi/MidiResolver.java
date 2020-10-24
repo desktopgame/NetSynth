@@ -122,11 +122,25 @@ public class MidiResolver<T> {
                 });
                 continue;
             }
-            MidiPlayer player = new MidiReceiverPlayer(midiConOpt.get().getReceiver().get());
-            try {
-                player.setup(setting.setting, eventFactory.create(setting.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
-                players.add(player);
-            } catch (InvalidMidiDataException ex) {
+            MidiDeviceController midiCon = midiConOpt.get();
+            // シンセサイザーならチャンネルを使用する
+            if (!synthesizerMap.containsKey(setting.synthesizer) && midiCon.isSynthesizer()) {
+                Synthesizer synthesizer = midiCon.getSynthesizer().get();
+                MidiChannel channel = synthesizer.getChannels()[setting.setting.isDrum ? 9 : 0];
+                MidiPlayer player = new MidiChannelPlayer(channel);
+                try {
+                    player.setup(setting.setting, eventFactory.create(setting.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
+                    players.add(player);
+                } catch (InvalidMidiDataException ex) {
+                }
+            } else {
+                // そうでなければレシーバに送信する
+                MidiPlayer player = new MidiReceiverPlayer(midiCon.getReceiver().get());
+                try {
+                    player.setup(setting.setting, eventFactory.create(setting.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
+                    players.add(player);
+                } catch (InvalidMidiDataException ex) {
+                }
             }
         }
         return players;
