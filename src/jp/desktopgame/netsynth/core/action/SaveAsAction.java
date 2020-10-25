@@ -61,6 +61,7 @@ public class SaveAsAction extends ViewAction {
                 return "*.json";
             }
         });
+        fc.setSelectedFile(new File(name + ".json"));
         if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             try {
