@@ -234,6 +234,8 @@ public class WorkAreaPane extends JPanel {
                     int index = trackListModel.indexOf(tSetting);
                     trackList.repaint();
                     tabbedPane.setTitleAt(index, tSetting.getName());
+                } else if (pe.getPropertyName().equals("isDrum")) {
+                    editor.getKeyboard().setUseDrumMap((boolean) pe.getNewValue());
                 }
             });
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
