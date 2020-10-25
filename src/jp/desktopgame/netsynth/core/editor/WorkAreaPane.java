@@ -253,7 +253,10 @@ public class WorkAreaPane extends JPanel {
                     trackList.repaint();
                     tabbedPane.setTitleAt(index, tSetting.getName());
                 } else if (pe.getPropertyName().equals("isDrum")) {
+                    setupMidiPlayer();
                     editor.getKeyboard().setUseDrumMap((boolean) pe.getNewValue());
+                } else if (pe.getPropertyName().equals("isMute")) {
+                    setupMidiPlayer();
                 }
             });
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
