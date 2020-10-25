@@ -46,6 +46,12 @@ public class MidiMainPlayer<T> {
         }
     }
 
+    public MidiPlayerDependency<T> getDependency(int i) {
+        synchronized (SETTING_LOCK) {
+            return dependencies.get(i);
+        }
+    }
+
     public void removeDependency(MidiPlayerDependency<T> setting) {
         synchronized (SETTING_LOCK) {
             dependencies.remove(setting);

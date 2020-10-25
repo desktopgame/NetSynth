@@ -14,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
@@ -23,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -34,13 +36,22 @@ import jp.desktopgame.netsynth.core.project.ProjectSettingEventType;
 import jp.desktopgame.netsynth.midi.MidiMainPlayer;
 import jp.desktopgame.netsynth.midi.MidiPlayerDependency;
 import jp.desktopgame.netsynth.midi.MidiPlayerSetting;
+import jp.desktopgame.netsynth.midi.VirtualMidiEvent;
+import jp.desktopgame.netsynth.midi.VirtualMidiListener;
 import jp.desktopgame.netsynth.midi.VirtualMidiSequencer;
+import jp.desktopgame.prc.BeatEvent;
+import jp.desktopgame.prc.BeatEventType;
+import jp.desktopgame.prc.KeyEvent;
 import jp.desktopgame.prc.MIDI;
+import jp.desktopgame.prc.MeasureEvent;
+import jp.desktopgame.prc.Note;
+import jp.desktopgame.prc.NoteEvent;
 import jp.desktopgame.prc.PianoRoll;
 import jp.desktopgame.prc.PianoRollEditorPane;
 import jp.desktopgame.prc.PianoRollGroup;
 import jp.desktopgame.prc.PianoRollLayerUI;
 import jp.desktopgame.prc.PianoRollModel;
+import jp.desktopgame.prc.PianoRollModelEvent;
 import jp.desktopgame.prc.UpdateRate;
 
 /**
@@ -109,21 +120,27 @@ public class WorkAreaPane extends JPanel {
     //
     // 再生
     //
-    public void playSequence() {
+    private void setupMidiPlayer() {
         midiPlayer.clearDependency();
         for (int i = 0; i < getTrackCount(); i++) {
-            ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
             TrackSetting ts = ProjectSetting.Context.getProjectSetting().getTrackSetting(i);
             PianoRollEditorPane editor = getEditor(i);
             PianoRollModel model = editor.getPianoRoll().getModel();
-            editor.getPianoRollLayerUI().playSequence();
             VirtualMidiSequencer vseq = new RealtimeMidiSequencer(editor.getPianoRollLayerUI(), ts);
             MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram(), true);
             MidiPlayerDependency<PianoRollModel> dep = new MidiPlayerDependency<>(ts.getSynthesizer(), model, setting);
             midiPlayer.addDependency(dep);
-            editor.getPianoRollLayerUI().setSyncScrollPane(true);
         }
         midiPlayer.setup();
+    }
+
+    public void playSequence() {
+        setupMidiPlayer();
+        for (int i = 0; i < getTrackCount(); i++) {
+            PianoRollEditorPane editor = getEditor(i);
+            editor.getPianoRollLayerUI().playSequence();
+            editor.getPianoRollLayerUI().setSyncScrollPane(true);
+        }
     }
 
     public void pauseSequence() {
@@ -229,6 +246,7 @@ public class WorkAreaPane extends JPanel {
             if (tSetting.getName().equals("Track")) {
                 tSetting.setName("Track." + tabs);
             }
+            editor.getPianoRoll().getModel().addPianoRollModelListener((pe) -> onModelUpdate(i, pe));
             tSetting.addPropertyChangeListener((pe) -> {
                 if (pe.getPropertyName().equals("name")) {
                     int index = trackListModel.indexOf(tSetting);
@@ -250,12 +268,49 @@ public class WorkAreaPane extends JPanel {
             trackListModel.addElement(tSetting);
             trackList.setSelectedIndex(trackListModel.getSize() - 1);
             removeTrackAction.setEnabled(true);
+            setupMidiPlayer();
             fireTrackChange();
         } else if (e.getType() == ProjectSettingEventType.TRACK_REMOVED) {
+            setupMidiPlayer();
             pGroup.removePianoRoll(i);
             tabbedPane.remove(i);
             trackListModel.removeElementAt(i);
         }
+    }
+
+    private void onModelUpdate(int i, PianoRollModelEvent pe) {
+        Optional<NoteEvent> neOpt = pe.getNoteEvent();
+        Optional<BeatEvent> beOpt = pe.getBeatEvent();
+        Optional<MeasureEvent> meOpt = pe.getMeasureEvent();
+        Optional<KeyEvent> keOpt = pe.getInnerEvent();
+        if (!beOpt.isPresent()) {
+            return;
+        }
+        // ノート作成時に音を鳴らす
+        BeatEvent be = beOpt.get();
+        if (be.getBeatEventType() != BeatEventType.NOTE_CREATED) {
+            return;
+        }
+        midiPlayer.getDependency(i).player.ifPresent((player) -> {
+            if (!(player instanceof VirtualMidiListener)) {
+                return;
+            }
+            VirtualMidiListener vml = (VirtualMidiListener) player;
+            triggerMidiEvent(vml, be.getNote());
+        });
+    }
+
+    private void triggerMidiEvent(VirtualMidiListener listener, Note note) {
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                PianoRollModel pModel = note.getBeat().getMeasure().getKey().getModel();
+                listener.virtualPlay(new VirtualMidiEvent("", (pModel.getKeyCount() - note.getBeat().getMeasure().getKey().getIndex()), 100, true));
+                Thread.sleep(500);
+                listener.virtualPlay(new VirtualMidiEvent("", (pModel.getKeyCount() - note.getBeat().getMeasure().getKey().getIndex()), 100, false));
+                return null;
+            }
+        }.execute();
     }
 
     private void projectPropertyChanged(PropertyChangeEvent evt) {

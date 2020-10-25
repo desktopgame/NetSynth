@@ -93,6 +93,7 @@ public class MidiResolver<T> {
                 }
                 MidiChannel channel = synthesizer.getChannels()[channelIndex];
                 MidiPlayer player = new MidiChannelPlayer(channel);
+                os.player = Optional.of(player);
                 try {
                     player.setup(os.setting, eventFactory.create(os.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
                     players.add(player);
@@ -113,6 +114,7 @@ public class MidiResolver<T> {
                 Optional<SoundDatabase> sdbOpt = SoundDatabase.get(setting.synthesizer);
                 sdbOpt.ifPresent((sdb) -> {
                     MidiPlayer player = new MidiSEPlayer(sdb);
+                    setting.player = Optional.of(player);
                     try {
                         player.setup(setting.setting, eventFactory.create(setting.userObject, index, timebase, beatWidth, bpm), timebase, bpm);
                         players.add(player);
@@ -128,6 +130,7 @@ public class MidiResolver<T> {
                 Synthesizer synthesizer = midiCon.getSynthesizer().get();
                 MidiChannel channel = synthesizer.getChannels()[setting.setting.isDrum ? 9 : 0];
                 MidiPlayer player = new MidiChannelPlayer(channel);
+                setting.player = Optional.of(player);
                 try {
                     player.setup(setting.setting, eventFactory.create(setting.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
                     players.add(player);

@@ -8,6 +8,9 @@
  */
 package jp.desktopgame.netsynth.midi;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * {@link jp.desktopgame.netsynth.midi.MidiPlayerSetting}に加えてMidiイベントを生成するための付加情報が含まれたクラスです.
  *
@@ -19,11 +22,13 @@ public class MidiPlayerDependency<T> {
     public final String synthesizer;
     public final T userObject;
     public final MidiPlayerSetting setting;
+    public Optional<MidiPlayer> player;
 
     public MidiPlayerDependency(String synthesizer, T userObject, MidiPlayerSetting setting) {
         this.synthesizer = synthesizer;
         this.userObject = userObject;
         this.setting = setting;
+        this.player = Optional.empty();
     }
 
 }
