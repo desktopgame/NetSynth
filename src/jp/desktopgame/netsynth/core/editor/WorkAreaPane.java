@@ -121,7 +121,7 @@ public class WorkAreaPane extends JPanel {
             MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram(), true);
             MidiPlayerDependency<PianoRollModel> dep = new MidiPlayerDependency<>(ts.getSynthesizer(), model, setting);
             midiPlayer.addDependency(dep);
-
+            editor.getPianoRollLayerUI().setSyncScrollPane(true);
         }
         midiPlayer.setup();
     }
@@ -129,12 +129,14 @@ public class WorkAreaPane extends JPanel {
     public void pauseSequence() {
         for (int i = 0; i < getTrackCount(); i++) {
             getEditor(i).getPianoRollLayerUI().stopSequence();
+            getEditor(i).getPianoRollLayerUI().setSyncScrollPane(false);
         }
     }
 
     public void resumeSequence() {
         for (int i = 0; i < getTrackCount(); i++) {
             getEditor(i).getPianoRollLayerUI().playSequence();
+            getEditor(i).getPianoRollLayerUI().setSyncScrollPane(false);
         }
     }
 
