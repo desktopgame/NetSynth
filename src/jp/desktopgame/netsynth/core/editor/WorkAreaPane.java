@@ -39,6 +39,7 @@ import jp.desktopgame.prc.MIDI;
 import jp.desktopgame.prc.PianoRoll;
 import jp.desktopgame.prc.PianoRollEditorPane;
 import jp.desktopgame.prc.PianoRollGroup;
+import jp.desktopgame.prc.PianoRollLayerUI;
 import jp.desktopgame.prc.PianoRollModel;
 import jp.desktopgame.prc.UpdateRate;
 
@@ -221,6 +222,7 @@ public class WorkAreaPane extends JPanel {
         if (e.getType() == ProjectSettingEventType.TRACK_ADDED) {
             int tabs = tabbedPane.getTabCount();
             PianoRollEditorPane editor = new PianoRollEditorPane();
+            editor.getPianoRollLayerUI().setBarStyle(PianoRollLayerUI.BarStyle.PlayOneShot);
             TrackSetting tSetting = e.getSource().getTrackSetting(i);
             if (tSetting.getName().equals("Track")) {
                 tSetting.setName("Track." + tabs);
