@@ -87,7 +87,7 @@ public class MidiResolver<T> {
                 if (usedDrum && channelIndex >= 9) {
                     channelIndex++;
                 }
-                if (os.setting.isDrum) {
+                if (os.setting.isDrum && !os.setting.isMute) {
                     channelIndex = 9;
                     usedDrum = true;
                 }

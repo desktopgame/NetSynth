@@ -20,6 +20,7 @@ import javax.sound.midi.ShortMessage;
 public class MidiChannelPlayer extends MidiDirectPlayer {
 
     private MidiChannel channel;
+    private boolean isMute;
 
     public MidiChannelPlayer(MidiChannel channel) {
         this.channel = channel;
@@ -33,10 +34,14 @@ public class MidiChannelPlayer extends MidiDirectPlayer {
     @Override
     public void mute(boolean isMute) {
         channel.setMute(isMute);
+        this.isMute = isMute;
     }
 
     @Override
     protected void send(MidiEvent e) {
+        if (isMute) {
+            return;
+        }
         MidiMessage msg = e.getMessage();
         if (msg instanceof ShortMessage) {
             ShortMessage smsg = (ShortMessage) msg;
@@ -50,6 +55,9 @@ public class MidiChannelPlayer extends MidiDirectPlayer {
 
     @Override
     public void virtualPlay(VirtualMidiEvent e) {
+        if (isMute) {
+            return;
+        }
         if (e.noteOn) {
             channel.noteOn(e.height, e.velocity);
         } else {
