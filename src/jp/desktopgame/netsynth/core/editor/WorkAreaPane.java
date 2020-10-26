@@ -246,7 +246,6 @@ public class WorkAreaPane extends JPanel {
             if (tSetting.getName().equals("Track")) {
                 tSetting.setName("Track." + tabs);
             }
-            editor.getPianoRoll().getModel().addPianoRollModelListener((pe) -> onModelUpdate(i, pe));
             tSetting.addPropertyChangeListener((pe) -> {
                 if (pe.getPropertyName().equals("name")) {
                     int index = trackListModel.indexOf(tSetting);
@@ -265,6 +264,7 @@ public class WorkAreaPane extends JPanel {
             } else {
                 editor.getPianoRoll().setModel(tSetting.getModel());
             }
+            editor.getPianoRoll().getModel().addPianoRollModelListener((pe) -> onModelUpdate(i, pe));
             syncGlobalSetting(editor);
             pGroup.addPianoRoll(editor.getPianoRoll());
             tabbedPane.addTab(tSetting.getName(), editor);
