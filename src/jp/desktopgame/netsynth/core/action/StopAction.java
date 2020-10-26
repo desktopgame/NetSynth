@@ -12,14 +12,19 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import jp.desktopgame.netsynth.View;
+import jp.desktopgame.netsynth.core.editor.TrackChangeEvent;
 import jp.desktopgame.netsynth.resources.Resources;
 import jp.desktopgame.prc.PianoRollEditorPane;
+import jp.desktopgame.prc.SequenceEvent;
+import jp.desktopgame.prc.SequenceListener;
 
 /**
  *
  * @author desktopgame
  */
-public class StopAction extends EditorAction {
+public class StopAction extends EditorAction implements SequenceListener {
+
+    private PianoRollEditorPane editor;
 
     public StopAction(View view) {
         super(view);
@@ -35,12 +40,35 @@ public class StopAction extends EditorAction {
     }
 
     @Override
+    protected void trackChange(TrackChangeEvent e) {
+        super.trackChange(e); //To change body of generated methods, choose Tools | Templates.
+        int i = view.getWorkAreaPane().getSelectedTrackIndex();
+        if (editor != null) {
+            editor.getPianoRollLayerUI().removeSequenceListener(this);
+        }
+        if (i < 0) {
+            return;
+        }
+        this.editor = view.getWorkAreaPane().getEditor(i);
+        editor.getPianoRollLayerUI().addSequenceListener(this);
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e, PianoRollEditorPane editor) {
         view.getWorkAreaPane().stopSequence();
         editor.getPianoRollLayerUI().setSequencePosition(0);
         view.getAction("PlayAction").setEnabled(true);
         view.getAction("PauseAction").setEnabled(false);
         setEnabled(false);
+    }
+
+    @Override
+    public void sequenceUpdate(SequenceEvent e) {
+        if (isEnabled() && e.getNewPosition() == 0) {
+            setEnabled(false);
+            view.getAction("PauseAction").setEnabled(false);
+            view.getAction("PlayAction").setEnabled(true);
+        }
     }
 
 }
