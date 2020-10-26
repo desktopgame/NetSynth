@@ -20,6 +20,7 @@ import javax.sound.midi.Track;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import static jp.desktopgame.netsynth.NetSynth.logException;
+import static jp.desktopgame.netsynth.NetSynth.logInformation;
 import jp.desktopgame.netsynth.View;
 import jp.desktopgame.netsynth.core.GlobalSetting;
 import jp.desktopgame.netsynth.core.editor.TrackSetting;
@@ -45,6 +46,10 @@ public class ExportAction extends ViewAction {
 
     @Override
     public void actionPerformed(ActionEvent arg0) {
+        ProjectSetting.Context pctx = ProjectSetting.Context.getInstance();
+        if (!pctx.getFilePath().isPresent()) {
+            view.getAction("SaveAsAction").actionPerformed(arg0);
+        }
         GlobalSetting gs = GlobalSetting.Context.getGlobalSetting();
         ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
         try {
@@ -58,7 +63,9 @@ public class ExportAction extends ViewAction {
                 Track t = seq.createTrack();
                 events.forEach(t::add);
             }
-            MidiSystem.write(seq, 1, new File("mid.mid"));
+            File file = new File(ps.getName() + ".mid");
+            MidiSystem.write(seq, 1, file);
+            logInformation(file.getPath() + "が作成されました。");
         } catch (InvalidMidiDataException | IOException ex) {
             logException(ex);
         }
