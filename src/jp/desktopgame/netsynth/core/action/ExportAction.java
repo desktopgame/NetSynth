@@ -64,7 +64,7 @@ public class ExportAction extends ViewAction {
                 events.forEach(t::add);
             }
             File file = new File(ps.getName() + ".mid");
-            MidiSystem.write(seq, 1, file);
+            MidiSystem.write(seq, gs.getMidiFileType(), file);
             logInformation(file.getPath() + "が作成されました。");
         } catch (InvalidMidiDataException | IOException ex) {
             logException(ex);

@@ -76,6 +76,12 @@ public class GlobalSetting {
     private String lookAndFeel;
 
     @Expose
+    @SetMethod
+    @GetMethod
+    @Property("MIDIファイルタイプ")
+    private int midiFileType;
+
+    @Expose
     private PhraseList phraseList;
 
     @Expose
@@ -90,6 +96,7 @@ public class GlobalSetting {
         this.beatWidth = 96;
         this.beatHeight = 24;
         this.beatSplitCount = 4;
+        this.midiFileType = 1;
         this.phraseList = new PhraseList();
         this.garageBandSoundDir = "/Library/Application Support/GarageBand/Instrument Library/Sampler/Sampler Files";
         this.anotherSoundDirList = new ArrayList<>();
@@ -142,6 +149,14 @@ public class GlobalSetting {
 
     public String getLookAndFeel() {
         return lookAndFeel;
+    }
+
+    public void setMidiFileType(int midiFileType) {
+        this.midiFileType = midiFileType;
+    }
+
+    public int getMidiFileType() {
+        return midiFileType;
     }
 
     public Optional<SoundDatabase> getGarageBandSoundDatabase() {
