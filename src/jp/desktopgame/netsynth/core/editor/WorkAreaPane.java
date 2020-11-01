@@ -8,7 +8,6 @@
  */
 package jp.desktopgame.netsynth.core.editor;
 
-import jp.desktopgame.netsynth.core.project.TrackSetting;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -34,6 +33,7 @@ import jp.desktopgame.netsynth.core.GlobalSetting;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
 import jp.desktopgame.netsynth.core.project.ProjectSettingEvent;
 import jp.desktopgame.netsynth.core.project.ProjectSettingEventType;
+import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.midi.MidiMainPlayer;
 import jp.desktopgame.netsynth.midi.MidiPlayerDependency;
 import jp.desktopgame.netsynth.midi.MidiPlayerSetting;
@@ -128,7 +128,7 @@ public class WorkAreaPane extends JPanel {
             PianoRollEditorPane editor = getEditor(i);
             PianoRollModel model = editor.getPianoRoll().getModel();
             VirtualMidiSequencer vseq = new RealtimeMidiSequencer(editor.getPianoRollLayerUI(), ts);
-            MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram(), true);
+            MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram());
             MidiPlayerDependency<PianoRollModel> dep = new MidiPlayerDependency<>(ts.getSynthesizer(), model, setting);
             midiPlayer.addDependency(dep);
         }

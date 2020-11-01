@@ -35,18 +35,13 @@ public class MidiPlayerSetting {
      * 使用するプログラム番号.
      */
     public final int program;
-    /**
-     * GUIと同期するなら true .
-     */
-    public final boolean sync;
 
-    public MidiPlayerSetting(VirtualMidiSequencer virtualMidiSequencer, boolean isMute, boolean isDrum, int bank, int program, boolean sync) {
+    public MidiPlayerSetting(VirtualMidiSequencer virtualMidiSequencer, boolean isMute, boolean isDrum, int bank, int program) {
         this.virtualMidiSequencer = virtualMidiSequencer;
         this.isMute = isMute;
         this.isDrum = isDrum;
         this.bank = bank;
         this.program = program;
-        this.sync = sync;
     }
 
 }

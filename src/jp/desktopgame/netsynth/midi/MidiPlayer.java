@@ -35,11 +35,6 @@ public interface MidiPlayer {
     public void reset();
 
     /**
-     * 再生を開始します.
-     */
-    public void start();
-
-    /**
      * 音色を変更します.
      *
      * @param bank
@@ -53,21 +48,6 @@ public interface MidiPlayer {
      * @param isMute
      */
     public void mute(boolean isMute);
-
-    /**
-     * 再生を一時停止します.
-     */
-    public void pause();
-
-    /**
-     * 再生を再開します.
-     */
-    public void resume();
-
-    /**
-     * 再生を停止します.
-     */
-    public void stop();
 
     /**
      * 現在のステータスを返します.
