@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.event.EventListenerList;
 import jp.desktopgame.netsynth.core.PianoRollModelTypeAdapter;
-import jp.desktopgame.netsynth.core.editor.TrackSetting;
 import jp.desktopgame.pec.GetMethod;
 import jp.desktopgame.pec.Property;
 import jp.desktopgame.pec.SetMethod;

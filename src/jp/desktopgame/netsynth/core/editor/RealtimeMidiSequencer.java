@@ -8,6 +8,7 @@
  */
 package jp.desktopgame.netsynth.core.editor;
 
+import jp.desktopgame.netsynth.core.project.TrackSetting;
 import javax.swing.event.EventListenerList;
 import jp.desktopgame.netsynth.midi.VirtualMidiEvent;
 import jp.desktopgame.netsynth.midi.VirtualMidiListener;

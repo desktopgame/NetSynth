@@ -6,7 +6,7 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  */
-package jp.desktopgame.netsynth.core.editor;
+package jp.desktopgame.netsynth.core.project;
 
 import com.google.gson.annotations.Expose;
 import java.beans.PropertyChangeListener;

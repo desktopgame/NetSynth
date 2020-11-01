@@ -8,6 +8,7 @@
  */
 package jp.desktopgame.netsynth.core.editor;
 
+import jp.desktopgame.netsynth.core.project.TrackSetting;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
