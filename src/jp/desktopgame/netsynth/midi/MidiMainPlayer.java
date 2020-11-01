@@ -18,12 +18,10 @@ import java.util.List;
  */
 public class MidiMainPlayer {
 
-    private MidiPlayerStatus status;
     private List<MidiPlayerDependency> dependencies;
     private List<MidiPlayer> players;
 
     public MidiMainPlayer() {
-        this.status = MidiPlayerStatus.WAITING;
         this.players = new ArrayList<>();
         this.dependencies = new ArrayList<>();
     }

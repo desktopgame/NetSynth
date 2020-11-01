@@ -43,10 +43,4 @@ public interface MidiPlayer {
      */
     public void mute(boolean isMute);
 
-    /**
-     * 現在のステータスを返します.
-     *
-     * @return
-     */
-    public MidiPlayerStatus getStatus();
 }
