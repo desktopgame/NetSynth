@@ -18,7 +18,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import jp.desktopgame.netsynth.console.ConsolePane;
@@ -58,6 +57,7 @@ import jp.desktopgame.netsynth.core.editor.TrackSettingPane;
 import jp.desktopgame.netsynth.core.editor.WorkAreaPane;
 import jp.desktopgame.netsynth.core.project.ProjectModifyEvent;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
+import jp.desktopgame.sbc.SideBar;
 
 /**
  *
@@ -69,7 +69,7 @@ public class View {
     private JMenuBar menuBar;
     private JToolBar toolBar;
     private JPanel rootPane;
-    private JSplitPane hSplit, vSplit;
+    private SideBar hBar, vBar;
     private JPanel leftPanel;
     private JPanel topPanel;
     private JPanel bottomPanel;
@@ -86,8 +86,12 @@ public class View {
         this.leftPanel = new JPanel(new BorderLayout());
         this.topPanel = new JPanel(new BorderLayout());
         this.bottomPanel = new JPanel(new BorderLayout());
-        this.vSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topPanel, bottomPanel);
-        this.hSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, vSplit);
+        this.vBar = new SideBar(SideBar.VERTICAL);
+        vBar.setView(topPanel);
+        vBar.addSlot("Log", bottomPanel);
+        this.hBar = new SideBar();
+        hBar.setView(vBar);
+        hBar.addSlot("Track", leftPanel);
         this.workAreaPane = new WorkAreaPane();
         this.consolePane = new ConsolePane();
         this.actionTable = new ActionTable(this);
@@ -210,7 +214,7 @@ public class View {
         topPanel.add(workAreaPane, BorderLayout.CENTER);
         bottomPanel.add(consolePane, BorderLayout.CENTER);
         rootPane.add(toolBar, BorderLayout.NORTH);
-        rootPane.add(hSplit, BorderLayout.CENTER);
+        rootPane.add(hBar, BorderLayout.CENTER);
         frame.setLayout(new BorderLayout());
         frame.setJMenuBar(menuBar);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -220,6 +224,10 @@ public class View {
         SwingUtilities.invokeLater(() -> {
             frame.setVisible(true);
             frame.setExtendedState(frame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
+            SwingUtilities.invokeLater(() -> {
+                hBar.minify();
+                vBar.minify();
+            });
             NetSynth.logInformation("ウィンドウの初期化が完了しました。");
         });
         // ウィンドウ最大化時に自動でスプリットペインの位置をいい感じに修正
@@ -230,8 +238,8 @@ public class View {
                     return;
                 }
                 SwingUtilities.invokeLater(() -> {
-                    hSplit.setDividerLocation(0.2);
-                    vSplit.setDividerLocation(0.8);
+                    hBar.minify();
+                    vBar.minify();
                 });
             }
         });
