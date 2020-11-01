@@ -43,7 +43,6 @@ import jp.desktopgame.netsynth.midi.VirtualMidiSequencer;
 import jp.desktopgame.prc.BeatEvent;
 import jp.desktopgame.prc.BeatEventType;
 import jp.desktopgame.prc.KeyEvent;
-import jp.desktopgame.prc.MIDI;
 import jp.desktopgame.prc.MeasureEvent;
 import jp.desktopgame.prc.Note;
 import jp.desktopgame.prc.NoteEvent;
@@ -67,7 +66,7 @@ public class WorkAreaPane extends JPanel {
     private JScrollPane trackListScroll;
     private JTabbedPane tabbedPane;
     private Container toolBar;
-    private MidiMainPlayer<PianoRollModel> midiPlayer;
+    private MidiMainPlayer midiPlayer;
     private PianoRollGroup pGroup;
 
     private AddTrackAction addTrackAction;
@@ -79,10 +78,7 @@ public class WorkAreaPane extends JPanel {
         this.trackListScroll = new JScrollPane(trackList);
         this.tabbedPane = new JTabbedPane();
         this.toolBar = Box.createHorizontalBox();
-        this.midiPlayer = new MidiMainPlayer<>((model, channel, timebase, bpm, beatWidth) -> {
-            int velocity = getTrackSetting(getIndexFromPianoRollModel(model)).getVelocity();
-            return MIDI.pianoRollModelToMidiEvents(model, channel, timebase, velocity, beatWidth);
-        }, 480, 120, GlobalSetting.Context.getGlobalSetting().getBeatWidth());
+        this.midiPlayer = new MidiMainPlayer();
         this.pGroup = new PianoRollGroup();
         trackList.setCellRenderer(new TrackListCellRenderer(pGroup));
         ProjectSetting.Context.getInstance().addProjectSettingListener(this::projectUpdate);
@@ -129,7 +125,7 @@ public class WorkAreaPane extends JPanel {
             PianoRollModel model = editor.getPianoRoll().getModel();
             VirtualMidiSequencer vseq = new RealtimeMidiSequencer(editor.getPianoRollLayerUI(), ts);
             MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram());
-            MidiPlayerDependency<PianoRollModel> dep = new MidiPlayerDependency<>(ts.getSynthesizer(), model, setting);
+            MidiPlayerDependency dep = new MidiPlayerDependency(ts.getSynthesizer(), setting);
             midiPlayer.addDependency(dep);
         }
         midiPlayer.setup();
@@ -335,8 +331,6 @@ public class WorkAreaPane extends JPanel {
             getAllEditor().stream().forEach((editor) -> {
                 editor.getPianoRollLayerUI().setSequenceUpdateRate(UpdateRate.bpmToUpdateRate(ps.getTimebase(), ps.getBPM()));
             });
-            midiPlayer.setTimebase(ps.getTimebase());
-            midiPlayer.setBPM(ps.getBPM());
         }
     }
 
@@ -348,7 +342,6 @@ public class WorkAreaPane extends JPanel {
             getAllEditor().stream().map((e) -> e.getPianoRoll()).forEach((p) -> {
                 p.setBeatWidth((int) n);
             });
-            midiPlayer.setBeatWidth((int) n);
         } else if (name.equals("beatHeight")) {
             getAllEditor().stream().map((e) -> e.getPianoRoll()).forEach((p) -> {
                 p.setBeatHeight((int) n);

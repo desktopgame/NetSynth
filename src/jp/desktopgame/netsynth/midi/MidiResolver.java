@@ -13,10 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiChannel;
 import javax.sound.midi.Sequencer;
 import javax.sound.midi.Synthesizer;
@@ -26,22 +23,13 @@ import jp.desktopgame.netsynth.sound.SoundDatabase;
  * Midiの依存関係設定から適切な{@link jp.desktopgame.netsynth.midi.MidiPlayer}を解決するクラスです.
  *
  * @author desktopgame
- * @param <T>
  */
-public class MidiResolver<T> {
+public class MidiResolver {
 
-    private MidiEventFactory<T> eventFactory;
-    private int timebase;
-    private int bpm;
-    private List<MidiPlayerDependency<T>> settings;
-    private int beatWidth;
+    private List<MidiPlayerDependency> settings;
 
-    public MidiResolver(MidiEventFactory<T> eventFactory, List<MidiPlayerDependency<T>> settings, int timebase, int bpm, int beatWidth) {
+    public MidiResolver(List<MidiPlayerDependency> settings) {
         this.settings = new ArrayList<>(settings);
-        this.eventFactory = eventFactory;
-        this.timebase = timebase;
-        this.bpm = bpm;
-        this.beatWidth = beatWidth;
     }
 
     /**
@@ -77,13 +65,13 @@ public class MidiResolver<T> {
                 return;
             }
             // 同じシンセサイザーを参照する他のトラックを取得
-            List<MidiPlayerDependency<T>> otherSettings = settings.stream().filter((e) -> e.synthesizer.equals(k)).collect(Collectors.toList());
+            List<MidiPlayerDependency> otherSettings = settings.stream().filter((e) -> e.synthesizer.equals(k)).collect(Collectors.toList());
             Synthesizer synthesizer = controllerOpt.get().getSynthesizer().get();
             // 全てにチャンネルを割り当てる
             boolean usedDrum = false;
             for (int i = 0; i < otherSettings.size(); i++) {
                 int channelIndex = i;
-                MidiPlayerDependency<T> os = otherSettings.get(i);
+                MidiPlayerDependency os = otherSettings.get(i);
                 if (usedDrum && channelIndex >= 9) {
                     channelIndex++;
                 }
@@ -94,20 +82,17 @@ public class MidiResolver<T> {
                 MidiChannel channel = synthesizer.getChannels()[channelIndex];
                 MidiPlayer player = new MidiChannelPlayer(channel);
                 os.player = Optional.of(player);
-                try {
-                    player.setup(os.setting, eventFactory.create(os.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
-                    players.add(player);
-                } catch (InvalidMidiDataException ex) {
-                }
+                player.setup(os.setting);
+                players.add(player);
             }
             synthesizerMap.put(k, Optional.empty());
         });
 
         // 他のトラックと重複しないシンセサイザーを使用するトラックのリスト
-        List<MidiPlayerDependency<T>> rawSettings = settings.stream().filter(((e) -> !synthesizerMap.containsKey(e.synthesizer))).collect(Collectors.toList());
+        List<MidiPlayerDependency> rawSettings = settings.stream().filter(((e) -> !synthesizerMap.containsKey(e.synthesizer))).collect(Collectors.toList());
         // MidiDirectPlayerを使ってイベントを送信
         for (int i = 0; i < rawSettings.size(); i++) {
-            final MidiPlayerDependency<T> setting = rawSettings.get(i);
+            final MidiPlayerDependency setting = rawSettings.get(i);
             Optional<MidiDeviceController> midiConOpt = controllers.stream().filter((e) -> e.getReceiver().isPresent()).filter((e) -> e.getInfo().getName().equals(setting.synthesizer)).findFirst();
             if (!midiConOpt.isPresent()) {
                 final int index = i;
@@ -115,12 +100,8 @@ public class MidiResolver<T> {
                 sdbOpt.ifPresent((sdb) -> {
                     MidiPlayer player = new MidiSEPlayer(sdb);
                     setting.player = Optional.of(player);
-                    try {
-                        player.setup(setting.setting, eventFactory.create(setting.userObject, index, timebase, beatWidth, bpm), timebase, bpm);
-                        players.add(player);
-                    } catch (InvalidMidiDataException ex) {
-                        Logger.getLogger(MidiResolver.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    player.setup(setting.setting);
+                    players.add(player);
                 });
                 continue;
             }
@@ -131,27 +112,21 @@ public class MidiResolver<T> {
                 MidiChannel channel = synthesizer.getChannels()[setting.setting.isDrum ? 9 : 0];
                 MidiPlayer player = new MidiChannelPlayer(channel);
                 setting.player = Optional.of(player);
-                try {
-                    player.setup(setting.setting, eventFactory.create(setting.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
-                    players.add(player);
-                } catch (InvalidMidiDataException ex) {
-                }
+                player.setup(setting.setting);
+                players.add(player);
             } else {
                 // そうでなければレシーバに送信する
                 MidiPlayer player = new MidiReceiverPlayer(midiCon.getReceiver().get());
-                try {
-                    player.setup(setting.setting, eventFactory.create(setting.userObject, i, timebase, beatWidth, bpm), timebase, bpm);
-                    players.add(player);
-                } catch (InvalidMidiDataException ex) {
-                }
+                player.setup(setting.setting);
+                players.add(player);
             }
         }
         return players;
     }
 
-    private Map<String, Integer> settingsToMap(List<MidiPlayerDependency<T>> settings) {
+    private Map<String, Integer> settingsToMap(List<MidiPlayerDependency> settings) {
         Map<String, Integer> r = new HashMap<>();
-        for (MidiPlayerDependency<T> s : settings) {
+        for (MidiPlayerDependency s : settings) {
             if (!r.containsKey(s.synthesizer)) {
                 r.put(s.synthesizer, 1);
             } else {

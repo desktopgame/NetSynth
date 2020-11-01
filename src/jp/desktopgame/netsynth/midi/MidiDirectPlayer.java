@@ -8,9 +8,6 @@
  */
 package jp.desktopgame.netsynth.midi;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import javax.sound.midi.MidiEvent;
 
 /**
@@ -20,24 +17,15 @@ import javax.sound.midi.MidiEvent;
 public abstract class MidiDirectPlayer implements MidiPlayer, VirtualMidiListener {
 
     private MidiPlayerStatus status;
-    private List<MidiEvent> events;
     private VirtualMidiSequencer vseq;
-    private Optional<MidiPlayerSetting> settingOpt;
-    private boolean pause;
-    private boolean exit;
     private int timebase, bpm;
 
     public MidiDirectPlayer() {
-        this.settingOpt = Optional.empty();
         this.status = MidiPlayerStatus.WAITING;
     }
 
     @Override
-    public final void setup(MidiPlayerSetting setting, List<MidiEvent> events, int timebase, int bpm) {
-        this.settingOpt = Optional.of(setting);
-        this.events = new ArrayList<>(events);
-        this.timebase = timebase;
-        this.bpm = bpm;
+    public final void setup(MidiPlayerSetting setting) {
         this.vseq = setting.virtualMidiSequencer;
         vseq.addVirtualMidiListener(this);
         this.status = MidiPlayerStatus.SYNC_PLAYING;

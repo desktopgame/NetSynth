@@ -15,7 +15,5 @@ package jp.desktopgame.netsynth.midi;
  */
 public enum MidiPlayerStatus {
     WAITING,
-    PLAYING,
-    PAUSED,
     SYNC_PLAYING,
 }

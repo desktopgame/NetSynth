@@ -15,37 +15,28 @@ import java.util.List;
  * MIDIの依存関係設定から
  *
  * @author desktopgame
- * @param <T>
  */
-public class MidiMainPlayer<T> {
+public class MidiMainPlayer {
 
     private MidiPlayerStatus status;
-    private List<MidiPlayerDependency<T>> dependencies;
+    private List<MidiPlayerDependency> dependencies;
     private List<MidiPlayer> players;
-    private MidiEventFactory<T> eventFactory;
-    private int timebase;
-    private int bpm;
-    private int beatWidth;
 
-    public MidiMainPlayer(MidiEventFactory<T> eventFactory, int timebase, int bpm, int beatWidth) {
-        this.eventFactory = eventFactory;
+    public MidiMainPlayer() {
         this.status = MidiPlayerStatus.WAITING;
         this.players = new ArrayList<>();
         this.dependencies = new ArrayList<>();
-        this.timebase = timebase;
-        this.bpm = bpm;
-        this.beatWidth = beatWidth;
     }
 
-    public void addDependency(MidiPlayerDependency<T> setting) {
+    public void addDependency(MidiPlayerDependency setting) {
         dependencies.add(setting);
     }
 
-    public MidiPlayerDependency<T> getDependency(int i) {
+    public MidiPlayerDependency getDependency(int i) {
         return dependencies.get(i);
     }
 
-    public void removeDependency(MidiPlayerDependency<T> setting) {
+    public void removeDependency(MidiPlayerDependency setting) {
         dependencies.remove(setting);
     }
 
@@ -63,32 +54,8 @@ public class MidiMainPlayer<T> {
      * 現在の依存関係でMIDIプレイヤーを構築します.
      */
     public void setup() {
-        MidiResolver<T> resolver = new MidiResolver<>(eventFactory, dependencies, timebase, bpm, beatWidth);
+        MidiResolver resolver = new MidiResolver(dependencies);
         this.players = new ArrayList<>(resolver.resolve());
-    }
-
-    public void setTimebase(int timebase) {
-        this.timebase = timebase;
-    }
-
-    public int getTimebase() {
-        return timebase;
-    }
-
-    public void setBPM(int bpm) {
-        this.bpm = bpm;
-    }
-
-    public int getBPM() {
-        return bpm;
-    }
-
-    public void setBeatWidth(int beatWidth) {
-        this.beatWidth = beatWidth;
-    }
-
-    public int getBeatWidth() {
-        return beatWidth;
     }
 
 }
