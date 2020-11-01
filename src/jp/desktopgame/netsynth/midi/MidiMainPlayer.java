@@ -56,4 +56,11 @@ public class MidiMainPlayer {
         this.players = new ArrayList<>(resolver.resolve());
     }
 
+    public void allNotesOff() {
+        players.stream().forEach(MidiPlayer::allNotesOff);
+    }
+
+    public void allSoundOff() {
+        players.stream().forEach(MidiPlayer::allSoundOff);
+    }
 }

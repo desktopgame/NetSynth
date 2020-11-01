@@ -43,4 +43,13 @@ public interface MidiPlayer {
      */
     public void mute(boolean isMute);
 
+    /**
+     * 全てのノートの再生を終了します.
+     */
+    public void allNotesOff();
+
+    /**
+     * 全ての音の再生を終了します.
+     */
+    public void allSoundOff();
 }

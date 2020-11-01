@@ -145,6 +145,7 @@ public class WorkAreaPane extends JPanel {
             getEditor(i).getPianoRollLayerUI().stopSequence();
             getEditor(i).getPianoRollLayerUI().setSyncScrollPane(false);
         }
+        midiPlayer.allNotesOff();
     }
 
     public void resumeSequence() {
@@ -160,6 +161,7 @@ public class WorkAreaPane extends JPanel {
             getEditor(i).getPianoRollLayerUI().setSequencePosition(0);
             getEditor(i).getPianoRollLayerUI().setSyncScrollPane(false);
         }
+        midiPlayer.allNotesOff();
     }
 
     //

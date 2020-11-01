@@ -64,4 +64,14 @@ public class MidiChannelPlayer extends MidiDirectPlayer {
             channel.noteOff(e.height, 0);
         }
     }
+
+    @Override
+    public void allNotesOff() {
+        channel.allNotesOff();
+    }
+
+    @Override
+    public void allSoundOff() {
+        channel.allSoundOff();
+    }
 }

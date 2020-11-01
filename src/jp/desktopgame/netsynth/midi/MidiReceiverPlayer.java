@@ -54,4 +54,12 @@ public class MidiReceiverPlayer extends MidiDirectPlayer {
             }
         }
     }
+
+    @Override
+    public void allNotesOff() {
+    }
+
+    @Override
+    public void allSoundOff() {
+    }
 }

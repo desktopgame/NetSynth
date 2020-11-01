@@ -81,4 +81,12 @@ public class MidiSEPlayer extends MidiDirectPlayer {
         this.isMute = isMute;
     }
 
+    @Override
+    public void allNotesOff() {
+    }
+
+    @Override
+    public void allSoundOff() {
+
+    }
 }
