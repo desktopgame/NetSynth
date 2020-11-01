@@ -161,6 +161,7 @@ public class WorkAreaPane extends JPanel {
         for (int i = 0; i < getTrackCount(); i++) {
             getEditor(i).getPianoRollLayerUI().stopSequence();
             getEditor(i).getPianoRollLayerUI().setSequencePosition(0);
+            getEditor(i).getPianoRollLayerUI().setSyncScrollPane(false);
         }
     }
 
