@@ -53,9 +53,13 @@ public class ProjectSetting {
     private int bpm;
     @Expose
     @Property("キーの高さ")
+    @SetMethod
+    @GetMethod
     private int keyMaxHeight;
     @Expose
     @Property("小節の数")
+    @SetMethod
+    @GetMethod
     private int measureMaxCount;
     @Expose
     private List<TrackSetting> trackSettingList;
