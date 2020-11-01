@@ -103,11 +103,11 @@ public class GlobalSetting {
         this.sampleSettings = new HashMap<>();
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
+    private void addPropertyChangeListener(PropertyChangeListener listener) {
         support.addPropertyChangeListener(listener);
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
+    private void removePropertyChangeListener(PropertyChangeListener listener) {
         support.removePropertyChangeListener(listener);
     }
 
