@@ -205,7 +205,7 @@ public class WorkAreaPane extends JPanel {
     }
 
     public int getTrackCount() {
-        return ProjectSetting.Context.getProjectSetting().getTrackSettingCount();
+        return ProjectSetting.Context.getProjectSetting().getGUITrackSettingCount();
     }
 
     /**

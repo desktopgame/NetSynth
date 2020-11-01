@@ -191,6 +191,7 @@ public class ProjectSetting {
 
     public void addTrackSetting(TrackSetting trackSetting) {
         trackSettingList.add(trackSetting);
+        trackSetting.setInternal(false);
         trackSetting.addPropertyChangeListener(propertyChangeHandler);
         modify();
         fireProjectUpdate(new ProjectSettingEvent(this, ProjectSettingEventType.TRACK_ADDED, trackSettingList.size() - 1));
@@ -215,6 +216,10 @@ public class ProjectSetting {
 
     public int getTrackSettingCount() {
         return trackSettingList.size();
+    }
+
+    public int getGUITrackSettingCount() {
+        return (int) trackSettingList.stream().filter((e) -> !e.isInternal()).count();
     }
 
     public static class Context {
@@ -298,6 +303,7 @@ public class ProjectSetting {
             this.filePath = Optional.of(file.getPath());
             for (int i = 0; i < setting.getTrackSettingCount(); i++) {
                 TrackSetting ts = setting.getTrackSetting(i);
+                ts.setInternal(false);
                 ts.addPropertyChangeListener((e) -> setting.modify());
                 ProjectSettingEvent e = new ProjectSettingEvent(setting, ProjectSettingEventType.TRACK_ADDED, i);
                 for (ProjectSettingListener listener : projectSettingListeners) {

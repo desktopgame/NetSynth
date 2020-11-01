@@ -64,6 +64,7 @@ public class TrackSetting {
     @Expose
     private PianoRollModel model;
     private PropertyChangeSupport support;
+    private boolean internal;
 
     public TrackSetting() {
         this.name = "Track";
@@ -75,6 +76,7 @@ public class TrackSetting {
         this.model = null;
         this.support = new PropertyChangeSupport(this);
         this.isDrum = false;
+        this.internal = true;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -159,6 +161,14 @@ public class TrackSetting {
 
     public PianoRollModel getModel() {
         return model;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
+    }
+
+    public boolean isInternal() {
+        return internal;
     }
 
     @Override
