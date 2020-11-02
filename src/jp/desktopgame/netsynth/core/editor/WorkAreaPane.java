@@ -118,7 +118,7 @@ public class WorkAreaPane extends JPanel {
     //
     // 再生
     //
-    private void setupMidiPlayer() {
+    public void setupMidiPlayer() {
         sequencers.clear();
         midiPlayer.clearDependency();
         for (int i = 0; i < getTrackCount(); i++) {

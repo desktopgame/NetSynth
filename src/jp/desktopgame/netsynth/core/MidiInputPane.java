@@ -82,18 +82,31 @@ public class MidiInputPane extends JPanel implements SlotCallback {
     }
 
     private void onSelectKeyboard(ItemEvent e) {
-        int i = keyboardComboBox.getSelectedIndex();
-        if (i >= 0) {
-            Transmitter t = controllers.get(i).getTransmitter().get();
-            enabledCheckBox.setSelected(false);
-            if (trMap.containsKey(t)) {
-                enabledCheckBox.setSelected(trMap.get(t).enabled);
-            }
+        int keyboard = keyboardComboBox.getSelectedIndex();
+        if (keyboard < 0) {
+            return;
         }
+        Transmitter t = controllers.get(keyboard).getSharedTransmitter(0).get();
+        enabledCheckBox.setSelected(false);
+        if (!trMap.containsKey(t)) {
+            return;
+        }
+        NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
+        enabledCheckBox.setSelected(trMap.get(t).enabled);
+        ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
+        ps.getTrackSetting(trMap.get(t).uuid).ifPresent((track) -> {
+            for (int i = 0; i < trackComboBox.getItemCount(); i++) {
+                if (ps.getTrackSetting(i).getUUID().equals(track.getUUID())) {
+                    trackComboBox.setSelectedIndex(i);
+                    break;
+                }
+            }
+        });
     }
 
     private void onSelectTrack(ItemEvent e) {
         getReceiver().ifPresent((r) -> {
+            NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
             r.uuid = ps.getTrackSetting(trackComboBox.getSelectedIndex()).getUUID();
             r.enabled = enabledCheckBox.isSelected();
@@ -103,6 +116,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
 
     private void onEnabled(ActionEvent e) {
         getReceiver().ifPresent((r) -> {
+            NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
             r.enabled = enabledCheckBox.isSelected();
             r.logInfo();
         });
@@ -118,7 +132,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
             return Optional.empty();
         }
         ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
-        Transmitter t = controllers.get(i).getTransmitter().get();
+        Transmitter t = controllers.get(i).getSharedTransmitter(0).get();
         if (!trMap.containsKey(t)) {
             MyReceiver mr = new MyReceiver(ps.getTrackSetting(track).getUUID(), t.getReceiver());
             trMap.put(t, mr);
@@ -129,6 +143,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
 
     @Override
     public void onShow() {
+        NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
         keyboardComboBoxModel.removeAllElements();
         trackComboBoxModel.removeAllElements();
         enabledCheckBox.setSelected(false);
@@ -197,6 +212,9 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 return;
             }
             TrackSetting ts = tsOpt.get();
+            if (!enabled || ts.isMute()) {
+                return;
+            }
             ShortMessage sm = (ShortMessage) arg0;
             int height = sm.getData1();
             int velocity = sm.getData2();
