@@ -74,7 +74,7 @@ public class ProjectSetting {
         this.timebase = 480;
         this.bpm = 120;
         this.keyMaxHeight = 12 * 11;
-        this.measureMaxCount = 4;
+        this.measureMaxCount = 20;
         this.trackSettingList = new ArrayList<>();
         this.listenerList = new EventListenerList();
         this.modified = false;
