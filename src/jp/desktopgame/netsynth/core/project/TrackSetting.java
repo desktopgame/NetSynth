@@ -32,6 +32,11 @@ public class TrackSetting {
     @GetMethod
     private String name;
     @Expose
+    @Property("自動生成専用")
+    @SetMethod("setAutoGenerate")
+    @GetMethod("isAutoGenerate")
+    private boolean autoGenerate;
+    @Expose
     @Property("ミュート")
     @SetMethod("setMute")
     @GetMethod
@@ -74,6 +79,7 @@ public class TrackSetting {
     public TrackSetting() {
         this.name = "Track";
         this.isMute = false;
+        this.autoGenerate = false;
         this.velocity = 100;
         this.bank = 0;
         this.program = 0;
@@ -111,6 +117,16 @@ public class TrackSetting {
 
     public boolean isMute() {
         return isMute;
+    }
+
+    public void setAutoGenerate(boolean autoGenerate) {
+        boolean a = this.autoGenerate;
+        this.autoGenerate = autoGenerate;
+        support.firePropertyChange("autoGenerate", a, autoGenerate);
+    }
+
+    public boolean isAutoGenerate() {
+        return autoGenerate;
     }
 
     public void setDrum(boolean isDrum) {

@@ -281,6 +281,8 @@ public class WorkAreaPane extends JPanel {
                     editor.getKeyboard().setUseDrumMap((boolean) pe.getNewValue());
                 } else if (pe.getPropertyName().equals("isMute")) {
                     setupMidiPlayer();
+                } else if (pe.getPropertyName().equals("autoGenerate")) {
+                    editor.getPianoRoll().setEditable(!(boolean) pe.getNewValue());
                 }
             });
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
@@ -289,6 +291,7 @@ public class WorkAreaPane extends JPanel {
             } else {
                 editor.getPianoRoll().setModel(tSetting.getModel());
             }
+            editor.getPianoRoll().setEditable(!tSetting.isAutoGenerate());
             editor.getPianoRoll().getModel().addPianoRollModelListener((pe) -> onModelUpdate(i, pe));
             syncGlobalSetting(editor);
             pGroup.addPianoRoll(editor.getPianoRoll());
