@@ -95,7 +95,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
     private void onSelectTrack(ItemEvent e) {
         getReceiver().ifPresent((r) -> {
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
-            r.ts = ps.getTrackSetting(trackComboBox.getSelectedIndex());
+            r.uuid = ps.getTrackSetting(trackComboBox.getSelectedIndex()).getUUID();
             r.enabled = enabledCheckBox.isSelected();
             r.logInfo();
         });
@@ -120,7 +120,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
         ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
         Transmitter t = controllers.get(i).getTransmitter().get();
         if (!trMap.containsKey(t)) {
-            MyReceiver mr = new MyReceiver(ps.getTrackSetting(track), t.getReceiver());
+            MyReceiver mr = new MyReceiver(ps.getTrackSetting(track).getUUID(), t.getReceiver());
             trMap.put(t, mr);
             t.setReceiver(mr);
         }
@@ -147,11 +147,11 @@ public class MidiInputPane extends JPanel implements SlotCallback {
     private class MyReceiver implements Receiver {
 
         private Receiver receiver;
-        public TrackSetting ts;
+        public String uuid;
         public boolean enabled;
 
-        public MyReceiver(TrackSetting ts, Receiver receiver) {
-            this.ts = ts;
+        public MyReceiver(String uuid, Receiver receiver) {
+            this.uuid = uuid;
             this.receiver = receiver;
             this.enabled = true;
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
@@ -159,7 +159,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 boolean found = false;
                 for (int i = 0; i < ps.getGUITrackSettingCount(); i++) {
                     TrackSetting g = ps.getTrackSetting(i);
-                    if (g.equals(ts)) {
+                    if (g.getUUID().equals(uuid)) {
                         found = true;
                         break;
                     }
@@ -172,6 +172,11 @@ public class MidiInputPane extends JPanel implements SlotCallback {
         }
 
         public void logInfo() {
+            Optional<TrackSetting> tsOpt = ProjectSetting.Context.getProjectSetting().getTrackSetting(uuid);
+            if (!tsOpt.isPresent()) {
+                return;
+            }
+            TrackSetting ts = tsOpt.get();
             if (this.enabled) {
                 NetSynth.logInformation(String.format("接続されました: %s", ts.getName()));
             } else {
@@ -187,6 +192,11 @@ public class MidiInputPane extends JPanel implements SlotCallback {
             if (!(arg0 instanceof ShortMessage)) {
                 return;
             }
+            Optional<TrackSetting> tsOpt = ProjectSetting.Context.getProjectSetting().getTrackSetting(uuid);
+            if (!tsOpt.isPresent()) {
+                return;
+            }
+            TrackSetting ts = tsOpt.get();
             ShortMessage sm = (ShortMessage) arg0;
             int height = sm.getData1();
             int velocity = sm.getData2();

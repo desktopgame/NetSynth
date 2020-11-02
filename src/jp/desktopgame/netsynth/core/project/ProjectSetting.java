@@ -213,6 +213,10 @@ public class ProjectSetting {
         }
     }
 
+    public Optional<TrackSetting> getTrackSetting(String uuid) {
+        return trackSettingList.stream().filter((e) -> e.getUUID().equals(uuid)).findFirst();
+    }
+
     public TrackSetting getTrackSetting(int i) {
         return trackSettingList.get(i);
     }
