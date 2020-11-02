@@ -8,6 +8,8 @@
  */
 package jp.desktopgame.netsynth.midi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
@@ -27,11 +29,15 @@ public class MidiDeviceController {
     private Optional<MidiDevice> deviceOpt;
     private int rc;
     private String alias;
+    private List<Transmitter> transmitterList;
+    private List<Receiver> receiverList;
 
     public MidiDeviceController(MidiDevice.Info info, MidiDevice device, String alias) {
         this.info = info;
         this.deviceOpt = Optional.ofNullable(device);
         this.alias = alias;
+        this.transmitterList = new ArrayList<>();
+        this.receiverList = new ArrayList<>();
     }
 
     public MidiDevice.Info getInfo() {
@@ -109,7 +115,9 @@ public class MidiDeviceController {
     public Optional<Receiver> getReceiver() {
         return deviceOpt.map((e) -> {
             try {
-                return e.getReceiver();
+                Receiver ret = e.getReceiver();
+                receiverList.add(ret);
+                return ret;
             } catch (MidiUnavailableException ex) {
                 //logException(ex);
                 return null;
@@ -120,12 +128,38 @@ public class MidiDeviceController {
     public Optional<Transmitter> getTransmitter() {
         return deviceOpt.map((e) -> {
             try {
-                return e.getTransmitter();
+                Transmitter ret = e.getTransmitter();
+                transmitterList.add(ret);
+                return ret;
             } catch (MidiUnavailableException ex) {
                 logException(ex);
                 return null;
             }
         });
+    }
+
+    public Optional<Transmitter> getSharedTransmitter(int i) {
+        while (i >= transmitterList.size()) {
+            if (!getTransmitter().isPresent()) {
+                break;
+            }
+        }
+        if (i >= transmitterList.size()) {
+            return Optional.empty();
+        }
+        return Optional.of(transmitterList.get(i));
+    }
+
+    public Optional<Receiver> getSharedReceiver(int i) {
+        while (i >= receiverList.size()) {
+            if (!getReceiver().isPresent()) {
+                break;
+            }
+        }
+        if (i >= receiverList.size()) {
+            return Optional.empty();
+        }
+        return Optional.of(receiverList.get(i));
     }
 
     public void lockHandle() {
