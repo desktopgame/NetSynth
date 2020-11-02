@@ -105,6 +105,9 @@ public class WorkAreaPane extends JPanel {
     }
 
     protected void fireTrackChange() {
+        for (int i = 0; i < getTrackCount(); i++) {
+            getEditor(i).getKeyboard().resetHighlight();
+        }
         TrackChangeEvent e = new TrackChangeEvent(this);
         for (TrackChangeListener listener : listenerList.getListeners(TrackChangeListener.class)) {
             listener.trackChange(e);

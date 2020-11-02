@@ -218,10 +218,14 @@ public class MidiInputPane extends JPanel implements SlotCallback {
             ShortMessage sm = (ShortMessage) arg0;
             int height = sm.getData1();
             int velocity = sm.getData2();
+            int track = NetSynth.getView().getWorkAreaPane().getSelectedTrackIndex();
             if (sm.getCommand() == ShortMessage.NOTE_ON) {
                 NetSynth.getView().getWorkAreaPane().noteOn(ts, height, velocity);
             } else if (sm.getCommand() == ShortMessage.NOTE_OFF) {
                 NetSynth.getView().getWorkAreaPane().noteOff(ts, height, velocity);
+            }
+            if (track >= 0) {
+                NetSynth.getView().getWorkAreaPane().getEditor(track).getKeyboard().setHighlight(height, sm.getCommand() == ShortMessage.NOTE_ON);
             }
         }
 
