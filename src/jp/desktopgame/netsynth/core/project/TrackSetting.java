@@ -11,6 +11,7 @@ package jp.desktopgame.netsynth.core.project;
 import com.google.gson.annotations.Expose;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.UUID;
 import jp.desktopgame.pec.GetMethod;
 import jp.desktopgame.pec.Property;
 import jp.desktopgame.pec.Separator;
@@ -63,6 +64,10 @@ public class TrackSetting {
 
     @Expose
     private PianoRollModel model;
+
+    @Expose
+    private String uuid;
+
     private PropertyChangeSupport support;
     private boolean internal;
 
@@ -76,6 +81,7 @@ public class TrackSetting {
         this.model = null;
         this.support = new PropertyChangeSupport(this);
         this.isDrum = false;
+        this.uuid = UUID.randomUUID().toString();
         this.internal = true;
     }
 
@@ -161,6 +167,18 @@ public class TrackSetting {
 
     public PianoRollModel getModel() {
         return model;
+    }
+
+    /**
+     * このトラックを一意に表すIDを返します.
+     *
+     * @return
+     */
+    public String getUUID() {
+        if (uuid == null || uuid.equals("")) {
+            uuid = UUID.randomUUID().toString();
+        }
+        return uuid;
     }
 
     public void setInternal(boolean internal) {
