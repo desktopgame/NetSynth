@@ -39,7 +39,6 @@ import jp.desktopgame.netsynth.midi.MidiPlayerDependency;
 import jp.desktopgame.netsynth.midi.MidiPlayerSetting;
 import jp.desktopgame.netsynth.midi.VirtualMidiEvent;
 import jp.desktopgame.netsynth.midi.VirtualMidiListener;
-import jp.desktopgame.netsynth.midi.VirtualMidiSequencer;
 import jp.desktopgame.prc.BeatEvent;
 import jp.desktopgame.prc.BeatEventType;
 import jp.desktopgame.prc.KeyEvent;
@@ -66,6 +65,7 @@ public class WorkAreaPane extends JPanel {
     private JScrollPane trackListScroll;
     private JTabbedPane tabbedPane;
     private Container toolBar;
+    private List<RealtimeMidiSequencer> sequencers;
     private MidiMainPlayer midiPlayer;
     private PianoRollGroup pGroup;
 
@@ -78,6 +78,7 @@ public class WorkAreaPane extends JPanel {
         this.trackListScroll = new JScrollPane(trackList);
         this.tabbedPane = new JTabbedPane();
         this.toolBar = Box.createHorizontalBox();
+        this.sequencers = new ArrayList<>();
         this.midiPlayer = new MidiMainPlayer();
         this.pGroup = new PianoRollGroup();
         trackList.setCellRenderer(new TrackListCellRenderer(pGroup));
@@ -118,15 +119,16 @@ public class WorkAreaPane extends JPanel {
     // 再生
     //
     private void setupMidiPlayer() {
+        sequencers.clear();
         midiPlayer.clearDependency();
         for (int i = 0; i < getTrackCount(); i++) {
             TrackSetting ts = ProjectSetting.Context.getProjectSetting().getTrackSetting(i);
             PianoRollEditorPane editor = getEditor(i);
-            PianoRollModel model = editor.getPianoRoll().getModel();
-            VirtualMidiSequencer vseq = new RealtimeMidiSequencer(editor.getPianoRollLayerUI(), ts);
+            RealtimeMidiSequencer vseq = new RealtimeMidiSequencer(editor.getPianoRollLayerUI(), ts);
             MidiPlayerSetting setting = new MidiPlayerSetting(vseq, ts.isMute(), ts.isDrum(), ts.getBank(), ts.getProgram());
             MidiPlayerDependency dep = new MidiPlayerDependency(ts.getSynthesizer(), setting);
             midiPlayer.addDependency(dep);
+            sequencers.add(vseq);
         }
         midiPlayer.setup();
     }
@@ -162,6 +164,26 @@ public class WorkAreaPane extends JPanel {
             getEditor(i).getPianoRollLayerUI().setSyncScrollPane(false);
         }
         midiPlayer.allNotesOff();
+    }
+
+    public void noteOn(TrackSetting t, int height, int velocity) {
+        for (int i = 0; i < getTrackCount(); i++) {
+            TrackSetting ts = ProjectSetting.Context.getProjectSetting().getTrackSetting(i);
+            if (ts == t) {
+                sequencers.get(i).noteOn(height, velocity);
+                break;
+            }
+        }
+    }
+
+    public void noteOff(TrackSetting t, int height, int velocity) {
+        for (int i = 0; i < getTrackCount(); i++) {
+            TrackSetting ts = ProjectSetting.Context.getProjectSetting().getTrackSetting(i);
+            if (ts == t) {
+                sequencers.get(i).noteOff(height);
+                break;
+            }
+        }
     }
 
     //

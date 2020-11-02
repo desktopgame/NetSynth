@@ -8,8 +8,9 @@
  */
 package jp.desktopgame.netsynth.core.editor;
 
-import jp.desktopgame.netsynth.core.project.TrackSetting;
+import javax.swing.SwingWorker;
 import javax.swing.event.EventListenerList;
+import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.midi.VirtualMidiEvent;
 import jp.desktopgame.netsynth.midi.VirtualMidiListener;
 import jp.desktopgame.netsynth.midi.VirtualMidiSequencer;
@@ -47,7 +48,33 @@ public class RealtimeMidiSequencer implements VirtualMidiSequencer, NotePlayList
         listenerList.remove(VirtualMidiListener.class, listener);
     }
 
-    private void fire(VirtualMidiEvent e) {
+    public void noteOn(int height, int velocity) {
+        fire(new VirtualMidiEvent(this, height, velocity, true));
+    }
+
+    public void noteOff(int height) {
+        fire(new VirtualMidiEvent(this, height, 0, false));
+    }
+
+    public void trigger(int height, int velocity, int ms) {
+        noteOn(height, velocity);
+        new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                Thread.sleep(ms);
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                super.done(); //To change body of generated methods, choose Tools | Templates.
+                noteOff(height);
+            }
+
+        }.execute();
+    }
+
+    public void fire(VirtualMidiEvent e) {
         for (VirtualMidiListener listener : listenerList.getListeners(VirtualMidiListener.class)) {
             listener.virtualPlay(e);
         }
@@ -60,9 +87,9 @@ public class RealtimeMidiSequencer implements VirtualMidiSequencer, NotePlayList
         Key key = note.getBeat().getMeasure().getKey();
         int height = note.getBeat().getMeasure().getKey().getModel().getKeyHeight(key.getIndex());
         if (type == NotePlayEventType.NOTE_ON) {
-            fire(new VirtualMidiEvent(this, height, trackSetting.getVelocity(), true));
+            noteOn(height, trackSetting.getVelocity());
         } else if (type == NotePlayEventType.NOTE_OFF) {
-            fire(new VirtualMidiEvent(this, height, 0, false));
+            noteOff(height);
         }
     }
 
