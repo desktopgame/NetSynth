@@ -69,6 +69,23 @@ public class GlobalSetting {
     private List<String> anotherSoundDirList;
 
     @Expose
+    @Separator("python(未インストール時は無視されます)")
+    @Property("pythonのパス(システム)")
+    private String pythonPath;
+
+    @Expose
+    @Property("pythonのパス(pyenv)")
+    private String pyenvPythonPath;
+
+    @Expose
+    @Property("pyenvを優先")
+    private boolean forcePyenvPath;
+
+    @Property("有効なpythonのパス(変更不可能)")
+    @GetMethod
+    private String activePythonPath;
+
+    @Expose
     @Separator("その他")
     @SetMethod
     @GetMethod
@@ -101,6 +118,11 @@ public class GlobalSetting {
         this.garageBandSoundDir = "/Library/Application Support/GarageBand/Instrument Library/Sampler/Sampler Files";
         this.anotherSoundDirList = new ArrayList<>();
         this.sampleSettings = new HashMap<>();
+        this.pythonPath = "";
+        this.pyenvPythonPath = "";
+        this.forcePyenvPath = true;
+        PythonUtil.getSystemPythonPath().ifPresent((e) -> this.pythonPath = e);
+        PythonUtil.getPyenvPythonPath().ifPresent((e) -> this.pyenvPythonPath = e);
     }
 
     private void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -202,6 +224,19 @@ public class GlobalSetting {
             sampleSettings.put(key, new SoundSampleSetting());
         }
         return sampleSettings.get(key);
+    }
+
+    public String getActivePythonPath() {
+        if (forcePyenvPath) {
+            if (pyenvPythonPath.equals("") && !pythonPath.equals("")) {
+                return pythonPath;
+            }
+            return pyenvPythonPath;
+        }
+        if (pythonPath.equals("") && !pyenvPythonPath.equals("")) {
+            return pyenvPythonPath;
+        }
+        return pythonPath;
     }
 
     public static class Context {
