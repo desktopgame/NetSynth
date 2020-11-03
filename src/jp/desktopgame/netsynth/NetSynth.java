@@ -14,6 +14,7 @@ import jp.desktopgame.netsynth.console.ConsoleType;
 import jp.desktopgame.netsynth.core.GlobalSetting;
 import jp.desktopgame.netsynth.midi.MidiDeviceManager;
 import jp.desktopgame.netsynth.mixer.MixerManager;
+import jp.desktopgame.netsynth.music21.Music21;
 
 /**
  * プログラムのエントリポイントです.
@@ -23,6 +24,7 @@ import jp.desktopgame.netsynth.mixer.MixerManager;
 public class NetSynth {
 
     private static View view;
+    private static Music21 music21;
 
     /**
      * @param args the command line arguments
@@ -33,6 +35,13 @@ public class NetSynth {
         MidiDeviceManager.getInstance().fetch();
         applyLookAndFeel();
         view = new View();
+        music21 = new Music21(GlobalSetting.Context.getGlobalSetting().getPythonPort());
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                music21.kill();
+            }
+        });
         view.show();
     }
 
@@ -52,6 +61,10 @@ public class NetSynth {
 
     public static View getView() {
         return view;
+    }
+
+    public static Music21 getMusic21() {
+        return music21;
     }
 
     public static void log(ConsoleType ct, String str) {

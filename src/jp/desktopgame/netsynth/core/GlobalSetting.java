@@ -85,6 +85,10 @@ public class GlobalSetting {
     @GetMethod
     private String activePythonPath;
 
+    @Property("ポート番号")
+    @GetMethod
+    private int pythonPort;
+
     @Expose
     @Separator("その他")
     @SetMethod
@@ -121,6 +125,7 @@ public class GlobalSetting {
         this.pythonPath = "";
         this.pyenvPythonPath = "";
         this.forcePyenvPath = true;
+        this.pythonPort = 8180;
         PythonUtil.getSystemPythonPath().ifPresent((e) -> this.pythonPath = e);
         PythonUtil.getPyenvPythonPath().ifPresent((e) -> this.pyenvPythonPath = e);
     }
@@ -237,6 +242,10 @@ public class GlobalSetting {
             return pyenvPythonPath;
         }
         return pythonPath;
+    }
+
+    public int getPythonPort() {
+        return pythonPort;
     }
 
     public static class Context {

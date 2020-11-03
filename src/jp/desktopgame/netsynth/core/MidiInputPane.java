@@ -8,6 +8,7 @@
  */
 package jp.desktopgame.netsynth.core;
 
+import com.google.gson.Gson;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
@@ -26,8 +28,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import jp.desktopgame.netsynth.NetSynth;
+import static jp.desktopgame.netsynth.NetSynth.logInformation;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
 import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.midi.MidiDeviceController;
@@ -50,13 +54,17 @@ public class MidiInputPane extends JPanel implements SlotCallback {
 
     private JCheckBox enabledCheckBox;
     private Map<Transmitter, MyReceiver> trMap;
-    private static Timer swingTimer;
+    private static Timer swingTimer, chordTimer;
 
     static {
         swingTimer = new Timer(0, (e) -> {
         });
         swingTimer.setDelay(1000);
         swingTimer.setRepeats(true);
+        chordTimer = new Timer(0, (e) -> {
+        });
+        chordTimer.setDelay(100);
+        chordTimer.setRepeats(false);
     }
 
     public MidiInputPane() {
@@ -165,10 +173,13 @@ public class MidiInputPane extends JPanel implements SlotCallback {
         public String uuid;
         public boolean enabled;
 
+        private List<Integer> keys;
+
         public MyReceiver(String uuid, Receiver receiver) {
             this.uuid = uuid;
             this.receiver = receiver;
             this.enabled = true;
+            this.keys = new ArrayList<>();
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
             swingTimer.addActionListener((e) -> {
                 boolean found = false;
@@ -184,6 +195,89 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                     logInfo();
                 }
             });
+            chordTimer.addActionListener((e) -> {
+                List<String> notes = keys.stream().map((k) -> {
+                    int oct = k / 12;
+                    int index = k % 12;
+                    StringBuilder sb = new StringBuilder();
+                    switch (index) {
+                        case 0:
+                            sb.append("C");
+                            break;
+                        case 1:
+                            sb.append("C#");
+                            break;
+                        case 2:
+                            sb.append("D");
+                            break;
+                        case 3:
+                            sb.append("D#");
+                            break;
+                        case 4:
+                            sb.append("E");
+                            break;
+                        case 5:
+                            sb.append("F");
+                            break;
+                        case 6:
+                            sb.append("F#");
+                            break;
+                        case 7:
+                            sb.append("G");
+                            break;
+                        case 8:
+                            sb.append("G#");
+                            break;
+                        case 9:
+                            sb.append("A");
+                            break;
+                        case 10:
+                            sb.append("A#");
+                            break;
+                        case 11:
+                            sb.append("B");
+                            break;
+                    }
+                    if (oct > 0) {
+                        sb.append(String.valueOf(oct));
+                    }
+                    return sb.toString();
+                }).collect(Collectors.toList());
+                execShowChord(notes);
+                keys.clear();
+            });
+        }
+
+        private void execShowChord(List<String> notes) {
+            if (!NetSynth.getMusic21().isActive()) {
+                logInformation("コードネームを表示できません。pythonパスを設定してください。");
+                return;
+            }
+            new SwingWorker<String, Void>() {
+                @Override
+                protected String doInBackground() throws Exception {
+                    return NetSynth.getMusic21().chordName(notes.toArray(new String[notes.size()])).get();
+                }
+
+                @Override
+                protected void done() {
+                    super.done(); //To change body of generated methods, choose Tools | Templates.
+                    try {
+                        String resp = get();
+                        if (resp.equals("")) {
+                            return;
+                        }
+                        ChordName name = new Gson().fromJson(resp, ChordName.class);
+                        if (name.status == 1) {
+                            return;
+                        }
+                        NetSynth.getView().getWorkAreaPane().showChordLabel(name.value);
+                    } catch (InterruptedException | ExecutionException | IllegalStateException ex) {
+                        NetSynth.logException(ex);
+                    }
+                }
+
+            }.execute();
         }
 
         public void logInfo() {
@@ -227,6 +321,8 @@ public class MidiInputPane extends JPanel implements SlotCallback {
             if (track >= 0) {
                 NetSynth.getView().getWorkAreaPane().getEditor(track).getKeyboard().setHighlight(height, sm.getCommand() == ShortMessage.NOTE_ON);
             }
+            keys.add(height);
+            chordTimer.restart();
         }
 
         @Override

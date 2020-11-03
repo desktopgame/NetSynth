@@ -19,6 +19,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -71,6 +72,7 @@ public class WorkAreaPane extends JPanel {
 
     private AddTrackAction addTrackAction;
     private RemoveTrackAction removeTrackAction;
+    private JLabel chordLabel;
 
     public WorkAreaPane() {
         super(new BorderLayout());
@@ -81,6 +83,7 @@ public class WorkAreaPane extends JPanel {
         this.sequencers = new ArrayList<>();
         this.midiPlayer = new MidiMainPlayer();
         this.pGroup = new PianoRollGroup();
+        this.chordLabel = new JLabel("");
         trackList.setCellRenderer(new TrackListCellRenderer(pGroup));
         ProjectSetting.Context.getInstance().addProjectSettingListener(this::projectUpdate);
         ProjectSetting.Context.getInstance().addPropertyChangeListener(this::projectPropertyChanged);
@@ -88,6 +91,7 @@ public class WorkAreaPane extends JPanel {
         tabbedPane.addChangeListener(new TabChangeHandler());
         toolBar.add(new JButton(this.addTrackAction = new AddTrackAction()));
         toolBar.add(new JButton(this.removeTrackAction = new RemoveTrackAction()));
+        toolBar.add(chordLabel);
         toolBar.add(Box.createHorizontalGlue());
         trackList.addListSelectionListener(new ListSelectionHandler());
         trackList.setFixedCellWidth(120);
@@ -187,6 +191,10 @@ public class WorkAreaPane extends JPanel {
                 break;
             }
         }
+    }
+
+    public void showChordLabel(String label) {
+        chordLabel.setText(label);
     }
 
     //
