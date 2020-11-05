@@ -78,7 +78,7 @@ public class AutoRecDialog extends JPanel {
             start.setEnabled(false);
             new AutoRecTask(dir, dlc, receiver, velocity.current(), seconds.current(), start, action).execute();
         });
-        pb.buildDialog("自動録音").show(null);
+        pb.buildDialog("自動録音").show(NetSynth.getView().getFrame());
     }
 
 }

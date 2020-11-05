@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import jp.desktopgame.netsynth.NetSynth;
 import jp.desktopgame.netsynth.mixer.DataLineConnection;
 import jp.desktopgame.netsynth.mixer.MixerController;
 import jp.desktopgame.netsynth.mixer.MixerManager;
@@ -123,7 +124,7 @@ public class LineConnectDialog extends JPanel {
                 updateButtonState(mixerCon, i);
             }
         });
-        pb.buildDialog("ライン接続").show(null);
+        pb.buildDialog("ライン接続").show(NetSynth.getView().getFrame());
     }
 
 }
