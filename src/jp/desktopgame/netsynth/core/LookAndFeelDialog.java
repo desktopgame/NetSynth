@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import jp.desktopgame.netsynth.NetSynth;
 import static jp.desktopgame.netsynth.NetSynth.logException;
 
 /**
@@ -79,7 +80,7 @@ public class LookAndFeelDialog extends JPanel {
     }
 
     public void showDialog() {
-        JDialog dialog = new JDialog();
+        JDialog dialog = new JDialog(NetSynth.getView().getFrame());
         dialog.setTitle("ルックアンドフィールの変更");
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

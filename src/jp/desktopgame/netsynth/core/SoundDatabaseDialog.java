@@ -22,6 +22,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
+import jp.desktopgame.netsynth.NetSynth;
 import jp.desktopgame.netsynth.sound.SoundDatabase;
 
 /**
@@ -130,7 +131,7 @@ public class SoundDatabaseDialog extends JPanel {
     }
 
     public void showDialog() {
-        JDialog dialog = new JDialog();
+        JDialog dialog = new JDialog(NetSynth.getView().getFrame());
         dialog.setTitle(getTitle());
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

@@ -29,6 +29,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import jp.desktopgame.netsynth.NetSynth;
 import jp.desktopgame.netsynth.mixer.DataLineConnection;
 import jp.desktopgame.netsynth.mixer.MixerController;
 import jp.desktopgame.netsynth.mixer.MixerManager;
@@ -167,7 +168,7 @@ public class MixerControlDialog extends JPanel {
     }
 
     public void showDialog() {
-        JDialog dialog = new JDialog();
+        JDialog dialog = new JDialog(NetSynth.getView().getFrame());
         dialog.setTitle("ミキサーコントロールパネル");
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
