@@ -33,6 +33,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import jp.desktopgame.netsynth.NetSynth;
 import jp.desktopgame.netsynth.midi.MidiDeviceController;
 import jp.desktopgame.netsynth.midi.MidiDeviceManager;
 import jp.desktopgame.pec.PropertyEditorPane;
@@ -195,7 +196,7 @@ public class MidiControlDialog extends JPanel {
     }
 
     public void showDialog() {
-        JDialog dialog = new JDialog();
+        JDialog dialog = new JDialog(NetSynth.getView().getFrame());
         dialog.setTitle("MIDIコントロールパネル");
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
