@@ -9,41 +9,26 @@
 package jp.desktopgame.netsynth.core;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.Line;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.TargetDataLine;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-import jp.desktopgame.netsynth.core.action.LineConnectAction;
 import jp.desktopgame.netsynth.mixer.DataLineConnection;
 import jp.desktopgame.netsynth.mixer.MixerController;
 import jp.desktopgame.netsynth.mixer.MixerManager;
-import jp.desktopgame.pec.PropertyEditorDialog;
+import jp.desktopgame.pec.builder.ComboBoxHelper;
+import jp.desktopgame.pec.builder.PropertyEditorBuilder;
 
 /**
+ * ライン接続ダイアログです.
  *
  * @author desktopgame
  */
 public class LineConnectDialog extends JPanel {
 
-    private DefaultComboBoxModel<String> mixerComboBoxModel;
-    private JComboBox<String> mixerComboBox;
-
-    private DefaultComboBoxModel<String> lineComboBoxModel;
-    private JComboBox<String> lineComboBox;
-
-    private JButton openButton;
-    private JButton closeButton;
+    private ComboBoxHelper<String> lines;
+    private JButton openButton, closeButton;
 
     private MixerManager mixerMan;
     private List<DataLineConnection> openedLineList;
@@ -51,27 +36,11 @@ public class LineConnectDialog extends JPanel {
 
     public LineConnectDialog() {
         super(new BorderLayout());
-        this.mixerComboBoxModel = new DefaultComboBoxModel<>();
-        this.mixerComboBox = new JComboBox<>(mixerComboBoxModel);
-        this.lineComboBoxModel = new DefaultComboBoxModel<>();
-        this.lineComboBox = new JComboBox<>(lineComboBoxModel);
-        this.openButton = new JButton("Open");
-        this.closeButton = new JButton("Close");
         this.mixerMan = MixerManager.getInstance();
         this.openedLineList = new ArrayList<>();
         this.closedLineList = new ArrayList<>();
         // 全てのマーク状態をリセット
         mixerMan.getControllers().stream().flatMap((e) -> e.getTargetLines().stream()).forEach((e) -> e.resetMark());
-
-        openButton.setEnabled(false);
-        closeButton.setEnabled(false);
-        openButton.addActionListener(this::onOpen);
-        closeButton.addActionListener(this::onClose);
-        mixerComboBox.addItemListener(this::onMixerSelect);
-        lineComboBox.addItemListener(this::onLineSelect);
-        mixerMan.getControllers().forEach((mixerCon) -> {
-            mixerComboBoxModel.addElement(mixerCon.getMixerName());
-        });
     }
 
     public List<DataLineConnection> getOpenedLines() {
@@ -82,63 +51,8 @@ public class LineConnectDialog extends JPanel {
         return new ArrayList<>(closedLineList);
     }
 
-    private void onOpen(ActionEvent e) {
-        int i = lineComboBox.getSelectedIndex();
-        if (i >= 0) {
-            MixerController mixerCon = mixerMan.getControllers().get(mixerComboBox.getSelectedIndex());
-            DataLineConnection line = mixerCon.getTargetLines().get(mixerCon.getTargetLineIndexFromAlias(lineComboBoxModel.getElementAt(i)));
-            //AudioFormat format = new AudioFormat(SAMPLE_RATE, SAMPLE_SIZE_IN_BITS, CHANNELS, SIGNED, BIG_ENDIAN);
-            //line.open(format);
-            line.setMark(true);
-            closedLineList.remove(line);
-            openedLineList.add(line);
-            openButton.setEnabled(false);
-            closeButton.setEnabled(true);
-        }
-    }
-
-    private void onClose(ActionEvent e) {
-        int i = lineComboBox.getSelectedIndex();
-        if (i >= 0) {
-            MixerController mixerCon = mixerMan.getControllers().get(mixerComboBox.getSelectedIndex());
-            DataLineConnection line = mixerCon.getTargetLines().get(mixerCon.getTargetLineIndexFromAlias(lineComboBoxModel.getElementAt(i)));
-            line.setMark(false);
-            openedLineList.remove(line);
-            closedLineList.add(line);
-            openButton.setEnabled(true);
-            closeButton.setEnabled(false);
-        }
-    }
-
-    private void onMixerSelect(ItemEvent e) {
-        int i = mixerComboBox.getSelectedIndex();
-        if (i >= 0) {
-            MixerController mixerCon = mixerMan.getControllers().get(i);
-            while (lineComboBoxModel.getSize() > 0) {
-                lineComboBoxModel.removeElementAt(0);
-            }
-            mixerCon.getTargetAliases().stream().forEach((line) -> {
-                lineComboBoxModel.addElement(line);
-            });
-            SwingUtilities.invokeLater(() -> {
-                int ii = lineComboBox.getSelectedIndex();
-                if (ii >= 0) {
-                    updateButtonState(mixerCon, ii);
-                }
-            });
-        }
-    }
-
-    private void onLineSelect(ItemEvent e) {
-        int i = lineComboBox.getSelectedIndex();
-        if (i >= 0) {
-            MixerController mixerCon = mixerMan.getControllers().get(mixerComboBox.getSelectedIndex());
-            updateButtonState(mixerCon, i);
-        }
-    }
-
     private void updateButtonState(MixerController mixerCon, int i) {
-        String key = lineComboBoxModel.getElementAt(i);
+        String key = lines.at(i);
         int index = mixerCon.getTargetLineIndexFromAlias(key);
         if (index < 0) {
             openButton.setEnabled(false);
@@ -151,26 +65,65 @@ public class LineConnectDialog extends JPanel {
     }
 
     public void showDialog() {
-
-        PropertyEditorDialog dialog = new PropertyEditorDialog() {
-            {
-                setHiddenApplyButton(true);
-                setHiddenCancelButton(true);
-                setTitle("ライン接続");
+        mixerMan.getControllers().stream().flatMap((e) -> e.getTargetLines().stream()).forEach((e) -> e.resetMark());
+        PropertyEditorBuilder pb = new PropertyEditorBuilder();
+        ComboBoxHelper<String> mixers = pb.comboBox("ミキサー").overwrite((Object[]) mixerMan.getControllers().stream().map((e) -> e.getMixerName()).toArray(String[]::new));
+        this.lines = pb.comboBox("ターゲットライン");
+        this.openButton = pb.footer(new JButton("Open"));
+        this.closeButton = pb.footer(new JButton("Close"));
+        openButton.setEnabled(false);
+        closeButton.setEnabled(false);
+        openButton.addActionListener((e) -> {
+            int i = lines.index();
+            if (i < 0) {
+                return;
             }
-
-            @Override
-            protected void init() {
-                super.init(); //To change body of generated methods, choose Tools | Templates.
-                mixerComboBox.setSelectedIndex(0);
-                addLine("ミキサー", mixerComboBox);
-                addLine("ターゲットライン", lineComboBox);
-                addLine(openButton);
-                addLine(closeButton);
-                addFooter();
+            MixerController mixerCon = mixerMan.getControllers().get(mixers.index());
+            DataLineConnection line = mixerCon.getTargetLines().get(mixerCon.getTargetLineIndexFromAlias(lines.at(i)));
+            line.setMark(true);
+            closedLineList.remove(line);
+            openedLineList.add(line);
+            openButton.setEnabled(false);
+            closeButton.setEnabled(true);
+        });
+        closeButton.addActionListener((e) -> {
+            int i = lines.index();
+            if (i < 0) {
+                return;
             }
-        };
-        dialog.show(null);
+            MixerController mixerCon = mixerMan.getControllers().get(mixers.index());
+            DataLineConnection line = mixerCon.getTargetLines().get(mixerCon.getTargetLineIndexFromAlias(lines.at(i)));
+            line.setMark(false);
+            openedLineList.remove(line);
+            closedLineList.add(line);
+            openButton.setEnabled(true);
+            closeButton.setEnabled(false);
+        });
+        mixers.onSelect((e) -> {
+            int i = mixers.index();
+            if (i < 0) {
+                return;
+            }
+            MixerController mixerCon = mixerMan.getControllers().get(i);
+            lines.removeAll();
+            mixerCon.getTargetAliases().stream().forEach((line) -> {
+                lines.add(line);
+            });
+            SwingUtilities.invokeLater(() -> {
+                int ii = lines.index();
+                if (ii >= 0) {
+                    updateButtonState(mixerCon, ii);
+                }
+            });
+        });
+        lines.onSelect((e) -> {
+            int i = lines.index();
+            if (i >= 0) {
+                MixerController mixerCon = mixerMan.getControllers().get(mixers.index());
+                updateButtonState(mixerCon, i);
+            }
+        });
+        pb.buildDialog("ライン接続").show(null);
     }
 
 }
