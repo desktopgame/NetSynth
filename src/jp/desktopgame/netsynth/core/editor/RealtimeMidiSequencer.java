@@ -8,7 +8,6 @@
  */
 package jp.desktopgame.netsynth.core.editor;
 
-import javax.swing.SwingWorker;
 import javax.swing.event.EventListenerList;
 import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.midi.VirtualMidiEvent;
@@ -20,6 +19,7 @@ import jp.desktopgame.prc.NotePlayEvent;
 import jp.desktopgame.prc.NotePlayEventType;
 import jp.desktopgame.prc.NotePlayListener;
 import jp.desktopgame.prc.PianoRollLayerUI;
+import jp.desktopgame.stask.SwingTask;
 
 /**
  *
@@ -58,20 +58,7 @@ public class RealtimeMidiSequencer implements VirtualMidiSequencer, NotePlayList
 
     public void trigger(int height, int velocity, int ms) {
         noteOn(height, velocity);
-        new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                Thread.sleep(ms);
-                return null;
-            }
-
-            @Override
-            protected void done() {
-                super.done(); //To change body of generated methods, choose Tools | Templates.
-                noteOff(height);
-            }
-
-        }.execute();
+        SwingTask.create(() -> Thread.sleep(ms)).done((e) -> noteOff(height));
     }
 
     public void fire(VirtualMidiEvent e) {
