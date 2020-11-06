@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.Receiver;
@@ -28,7 +27,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import jp.desktopgame.netsynth.NetSynth;
 import static jp.desktopgame.netsynth.NetSynth.logInformation;
@@ -39,6 +37,7 @@ import jp.desktopgame.netsynth.midi.MidiDeviceManager;
 import jp.desktopgame.netsynth.music21.JsonResponse;
 import jp.desktopgame.pec.PropertyEditorPane;
 import jp.desktopgame.sbc.SlotCallback;
+import jp.desktopgame.stask.SwingTask;
 
 /**
  *
@@ -254,35 +253,20 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 logInformation("コードネームを表示できません。pythonパスを設定してください。");
                 return;
             }
-            new SwingWorker<String, Void>() {
-                @Override
-                protected String doInBackground() throws Exception {
-                    return NetSynth.getMusic21().chordName(notes.toArray(new String[notes.size()])).get();
+            SwingTask.create(() -> NetSynth.getMusic21().chordName(notes.toArray(new String[notes.size()])).get()).done((resp) -> {
+                if (resp.equals("")) {
+                    return;
                 }
-
-                @Override
-                protected void done() {
-                    super.done(); //To change body of generated methods, choose Tools | Templates.
-                    try {
-                        String resp = get();
-                        if (resp.equals("")) {
-                            return;
-                        }
-                        JsonResponse jresp = new Gson().fromJson(resp, JsonResponse.class);
-                        if (jresp.status != 0) {
-                            return;
-                        }
-                        ChordName name = new Gson().fromJson(resp, ChordName.class);
-                        if (name.status == 1) {
-                            return;
-                        }
-                        NetSynth.getView().getWorkAreaPane().showChordLabel(name.value);
-                    } catch (InterruptedException | ExecutionException ex) {
-                        NetSynth.logException(ex);
-                    }
+                JsonResponse jresp = new Gson().fromJson(resp, JsonResponse.class);
+                if (jresp.status != 0) {
+                    return;
                 }
-
-            }.execute();
+                ChordName name = new Gson().fromJson(resp, ChordName.class);
+                if (name.status == 1) {
+                    return;
+                }
+                NetSynth.getView().getWorkAreaPane().showChordLabel(name.value);
+            });
         }
 
         public void logInfo() {
