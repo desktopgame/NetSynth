@@ -63,7 +63,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
         swingTimer.setRepeats(true);
         chordTimer = new Timer(0, (e) -> {
         });
-        chordTimer.setDelay(100);
+        chordTimer.setDelay(300);
         chordTimer.setRepeats(false);
     }
 
@@ -180,72 +180,75 @@ public class MidiInputPane extends JPanel implements SlotCallback {
             this.receiver = receiver;
             this.enabled = true;
             this.keys = new ArrayList<>();
+            swingTimer.addActionListener(this::onTickForPoll);
+            chordTimer.addActionListener(this::onTickForChordHint);
+        }
+
+        private void onTickForPoll(ActionEvent e) {
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
-            swingTimer.addActionListener((e) -> {
-                boolean found = false;
-                for (int i = 0; i < ps.getGUITrackSettingCount(); i++) {
-                    TrackSetting g = ps.getTrackSetting(i);
-                    if (g.getUUID().equals(uuid)) {
-                        found = true;
+            boolean found = false;
+            for (int i = 0; i < ps.getGUITrackSettingCount(); i++) {
+                TrackSetting g = ps.getTrackSetting(i);
+                if (g.getUUID().equals(uuid)) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                enabled = false;
+                logInfo();
+            }
+        }
+
+        private void onTickForChordHint(ActionEvent e) {
+            List<String> notes = keys.stream().map((k) -> {
+                int oct = k / 12;
+                int index = k % 12;
+                StringBuilder sb = new StringBuilder();
+                switch (index) {
+                    case 0:
+                        sb.append("C");
                         break;
-                    }
+                    case 1:
+                        sb.append("C#");
+                        break;
+                    case 2:
+                        sb.append("D");
+                        break;
+                    case 3:
+                        sb.append("D#");
+                        break;
+                    case 4:
+                        sb.append("E");
+                        break;
+                    case 5:
+                        sb.append("F");
+                        break;
+                    case 6:
+                        sb.append("F#");
+                        break;
+                    case 7:
+                        sb.append("G");
+                        break;
+                    case 8:
+                        sb.append("G#");
+                        break;
+                    case 9:
+                        sb.append("A");
+                        break;
+                    case 10:
+                        sb.append("A#");
+                        break;
+                    case 11:
+                        sb.append("B");
+                        break;
                 }
-                if (!found) {
-                    enabled = false;
-                    logInfo();
+                if (oct > 0) {
+                    sb.append(String.valueOf(oct));
                 }
-            });
-            chordTimer.addActionListener((e) -> {
-                List<String> notes = keys.stream().map((k) -> {
-                    int oct = k / 12;
-                    int index = k % 12;
-                    StringBuilder sb = new StringBuilder();
-                    switch (index) {
-                        case 0:
-                            sb.append("C");
-                            break;
-                        case 1:
-                            sb.append("C#");
-                            break;
-                        case 2:
-                            sb.append("D");
-                            break;
-                        case 3:
-                            sb.append("D#");
-                            break;
-                        case 4:
-                            sb.append("E");
-                            break;
-                        case 5:
-                            sb.append("F");
-                            break;
-                        case 6:
-                            sb.append("F#");
-                            break;
-                        case 7:
-                            sb.append("G");
-                            break;
-                        case 8:
-                            sb.append("G#");
-                            break;
-                        case 9:
-                            sb.append("A");
-                            break;
-                        case 10:
-                            sb.append("A#");
-                            break;
-                        case 11:
-                            sb.append("B");
-                            break;
-                    }
-                    if (oct > 0) {
-                        sb.append(String.valueOf(oct));
-                    }
-                    return sb.toString();
-                }).collect(Collectors.toList());
-                execShowChord(notes);
-                keys.clear();
-            });
+                return sb.toString();
+            }).collect(Collectors.toList());
+            execShowChord(notes);
         }
 
         private void execShowChord(List<String> notes) {
@@ -253,7 +256,11 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 logInformation("コードネームを表示できません。pythonパスを設定してください。");
                 return;
             }
-            SwingTask.create(() -> NetSynth.getMusic21().chordName(notes.toArray(new String[notes.size()])).get()).done((resp) -> {
+            SwingTask.create(() -> NetSynth.getMusic21().chordName(notes.toArray(new String[notes.size()])).get()).done((respOpt, _ex) -> {
+                if (!respOpt.isPresent()) {
+                    return;
+                }
+                String resp = respOpt.get();
                 if (resp.equals("")) {
                     return;
                 }
@@ -299,18 +306,22 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 return;
             }
             ShortMessage sm = (ShortMessage) arg0;
+            int cmd = sm.getCommand();
             int height = sm.getData1();
             int velocity = sm.getData2();
             int track = NetSynth.getView().getWorkAreaPane().getSelectedTrackIndex();
-            if (sm.getCommand() == ShortMessage.NOTE_ON) {
+            if (cmd == ShortMessage.NOTE_ON && velocity > 0) {
+                if (!keys.contains(height)) {
+                    keys.add(height);
+                }
                 NetSynth.getView().getWorkAreaPane().noteOn(ts, height, velocity);
-            } else if (sm.getCommand() == ShortMessage.NOTE_OFF) {
+            } else if (cmd == ShortMessage.NOTE_OFF || velocity <= 0) {
                 NetSynth.getView().getWorkAreaPane().noteOff(ts, height, velocity);
+                keys.remove((Object) height);
             }
             if (track >= 0) {
                 NetSynth.getView().getWorkAreaPane().getEditor(track).getKeyboard().setHighlight(height, sm.getCommand() == ShortMessage.NOTE_ON);
             }
-            keys.add(height);
             chordTimer.restart();
         }
 
