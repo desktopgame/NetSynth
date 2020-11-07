@@ -39,6 +39,12 @@ public class SoundDatabase {
         this.effects = new ArrayList<>();
     }
 
+    /**
+     * 指定のディレクトリを起点としてサウンドデータベースを作成します.
+     *
+     * @param rootDir
+     * @return
+     */
     public static SoundDatabase create(File rootDir) {
         SoundDatabase sdb = new SoundDatabase(rootDir);
         loadRec(sdb);
@@ -46,8 +52,14 @@ public class SoundDatabase {
         return sdb;
     }
 
+    /**
+     * 指定のパスに対応したサウンドデータベースを返します.
+     *
+     * @param path
+     * @return
+     */
     public static Optional<SoundDatabase> get(String path) {
-        final String[] arr = path.split("/");
+        final String[] arr = path.split(File.separator);
         Optional<SoundDatabase> rootOpt = sdbMap.values().stream().filter((e) -> e.getName().equals(arr[0])).findFirst();
         if (rootOpt.isPresent()) {
             SoundDatabase ret = rootOpt.get();
@@ -87,6 +99,11 @@ public class SoundDatabase {
         }
     }
 
+    /**
+     * 中身を指定のストリームにダンプします.
+     *
+     * @param out
+     */
     public void dump(OutputStream out) {
         dump(new PrintStream(out), this, 0);
     }
@@ -116,6 +133,11 @@ public class SoundDatabase {
         }
     }
 
+    /**
+     * このデータベース以下の階層に含まれる全てのサウンドエフェクトを返します.
+     *
+     * @return
+     */
     public List<SoundEffect> getAllEffects() {
         List<SoundEffect> dest = new ArrayList<>();
         getAllEffects(this, dest);
@@ -129,22 +151,48 @@ public class SoundDatabase {
         }
     }
 
+    /**
+     * このデータベースの直下のデータベースを返します.
+     *
+     * @return
+     */
     public List<SoundDatabase> getSubDatabase() {
         return new ArrayList<>(subdatabse);
     }
 
+    /**
+     * このデータベースの直下のサウンドエフェクトを返します.
+     *
+     * @return
+     */
     public List<SoundEffect> getEffects() {
         return new ArrayList<>(effects);
     }
 
+    /**
+     * ディレクトリを返します.
+     *
+     * @return
+     */
     public File getDirectory() {
         return directory;
     }
 
+    /**
+     * 名前を返します.
+     *
+     * @return
+     */
     public String getName() {
         return directory.getName();
     }
 
+    /**
+     * 全てのサブデータベースを返します.
+     *
+     * @param includeSelf
+     * @return
+     */
     public List<SoundDatabase> getIncludedSubDatabases(boolean includeSelf) {
         List<SoundDatabase> ret = new ArrayList<>();
         if (includeSelf) {

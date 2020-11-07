@@ -12,10 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- *
- * @author desktopgame
- */
 class Parser {
 
     private String source;
