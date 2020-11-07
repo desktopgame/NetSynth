@@ -8,11 +8,7 @@
  */
 package jp.desktopgame.netsynth.music21;
 
-/**
- *
- * @author desktopgame
- */
-public class ProcessUtil {
+class ProcessUtil {
 
     private ProcessUtil() {
     }

@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 
 /**
+ * Javaからpythonを操作するためのユーティリティです.
  *
  * @author desktopgame
  */
@@ -33,6 +34,11 @@ public class PythonUtil {
         return Optional.of(s);
     }
 
+    /**
+     * システムに元からインストールされているpythonのパスを返します.
+     *
+     * @return
+     */
     public static Optional<String> getSystemPythonPath() {
         try {
             Process proc = ProcessUtil.createShell("where python", "which python").start();
@@ -45,6 +51,11 @@ public class PythonUtil {
         }
     }
 
+    /**
+     * pyenvのパスを返します.
+     *
+     * @return
+     */
     public static Optional<String> getPyenvPath() {
         String homeDir = System.getenv("HOME");
         File f = new File(String.format("/usr/local/bin/pyenv", homeDir));
@@ -54,10 +65,21 @@ public class PythonUtil {
         return Optional.empty();
     }
 
+    /**
+     * pyenvが使用するpythonをバージョンを指定せずに検索して返します.
+     *
+     * @return
+     */
     public static Optional<String> getPyenvPythonPath() {
         return getPyenvPythonPath("");
     }
 
+    /**
+     * pyenvが使用するpythonを検索して返します.
+     *
+     * @param version
+     * @return
+     */
     public static Optional<String> getPyenvPythonPath(String version) {
         Optional<String> pathOpt = getPyenvPath().map((pyenv) -> {
             try {
