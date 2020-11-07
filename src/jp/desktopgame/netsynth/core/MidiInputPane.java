@@ -8,7 +8,6 @@
  */
 package jp.desktopgame.netsynth.core;
 
-import com.google.gson.Gson;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
@@ -34,6 +33,7 @@ import jp.desktopgame.netsynth.core.project.ProjectSetting;
 import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.midi.MidiDeviceController;
 import jp.desktopgame.netsynth.midi.MidiDeviceManager;
+import jp.desktopgame.netsynth.music21.ChordName;
 import jp.desktopgame.netsynth.music21.JsonResponse;
 import jp.desktopgame.pec.PropertyEditorPane;
 import jp.desktopgame.sbc.SlotCallback;
@@ -260,19 +260,9 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 if (!respOpt.isPresent()) {
                     return;
                 }
-                String resp = respOpt.get();
-                if (resp.equals("")) {
-                    return;
-                }
-                JsonResponse jresp = new Gson().fromJson(resp, JsonResponse.class);
-                if (jresp.status != 0) {
-                    return;
-                }
-                ChordName name = new Gson().fromJson(resp, ChordName.class);
-                if (name.status == 1) {
-                    return;
-                }
-                NetSynth.getView().getWorkAreaPane().showChordLabel(name.value);
+                JsonResponse.fromJson(respOpt.get(), ChordName.class).ifPresent((ChordName name) -> {
+                    NetSynth.getView().getWorkAreaPane().showChordLabel(name.value);
+                });
             });
         }
 

@@ -6,7 +6,7 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  */
-package jp.desktopgame.netsynth.core;
+package jp.desktopgame.netsynth.music21;
 
 /**
  *
@@ -16,4 +16,5 @@ public class ChordName {
 
     public int status;
     public String value;
+
 }
