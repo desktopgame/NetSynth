@@ -25,7 +25,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingWorker;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -53,6 +52,7 @@ import jp.desktopgame.prc.PianoRollLayerUI;
 import jp.desktopgame.prc.PianoRollModel;
 import jp.desktopgame.prc.PianoRollModelEvent;
 import jp.desktopgame.prc.UpdateRate;
+import jp.desktopgame.stask.SwingTask;
 
 /**
  * ユーザが作業するために表示される編集機能を持った領域です.
@@ -340,16 +340,12 @@ public class WorkAreaPane extends JPanel {
     }
 
     private void triggerMidiEvent(VirtualMidiListener listener, Note note) {
-        new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
-                PianoRollModel pModel = note.getBeat().getMeasure().getKey().getModel();
-                listener.virtualPlay(new VirtualMidiEvent("", (pModel.getKeyCount() - note.getBeat().getMeasure().getKey().getIndex()), 100, true));
-                Thread.sleep(500);
-                listener.virtualPlay(new VirtualMidiEvent("", (pModel.getKeyCount() - note.getBeat().getMeasure().getKey().getIndex()), 100, false));
-                return null;
-            }
-        }.execute();
+        SwingTask.create(() -> {
+            PianoRollModel pModel = note.getBeat().getMeasure().getKey().getModel();
+            listener.virtualPlay(new VirtualMidiEvent("", (pModel.getKeyCount() - note.getBeat().getMeasure().getKey().getIndex()), 100, true));
+            Thread.sleep(500);
+            listener.virtualPlay(new VirtualMidiEvent("", (pModel.getKeyCount() - note.getBeat().getMeasure().getKey().getIndex()), 100, false));
+        }).forget();
     }
 
     private void projectPropertyChanged(PropertyChangeEvent evt) {
