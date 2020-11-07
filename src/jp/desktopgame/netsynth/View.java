@@ -61,6 +61,7 @@ import jp.desktopgame.netsynth.core.project.ProjectSetting;
 import jp.desktopgame.sbc.SideBar;
 
 /**
+ * NetSynthのメインウィンドウです.
  *
  * @author desktopgame
  */
@@ -260,18 +261,48 @@ public class View {
         }
     }
 
+    /**
+     * ウィンドウを返します.
+     *
+     * @return
+     */
     public JFrame getFrame() {
         return frame;
     }
 
+    /**
+     * プロジェクト編集領域を返します.
+     *
+     * @return
+     */
     public WorkAreaPane getWorkAreaPane() {
         return workAreaPane;
     }
 
+    /**
+     * ログ表示領域を返します.
+     *
+     * @return
+     */
     public ConsolePane getConsolePane() {
         return consolePane;
     }
 
+    /**
+     * アクションテーブルを返します.
+     *
+     * @return
+     */
+    public ActionTable getActionTable() {
+        return actionTable;
+    }
+
+    /**
+     * 指定の名前のアクションを返します.
+     *
+     * @param key
+     * @return
+     */
     public Action getAction(String key) {
         return actionTable.get(key);
     }

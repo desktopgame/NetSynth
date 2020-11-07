@@ -1,7 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * NetSynth
+ *
+ * Copyright (c) 2020 desktopgame
+ *
+ * This software is released under the MIT License.
+ * http://opensource.org/licenses/mit-license.php
  */
 package jp.desktopgame.netsynth;
 
@@ -59,14 +62,30 @@ public class NetSynth {
         }
     }
 
+    /**
+     * メインウィンドウを返します
+     *
+     * @return
+     */
     public static View getView() {
         return view;
     }
 
+    /**
+     * music21と通信するためのサーバを返します.
+     *
+     * @return
+     */
     public static Music21 getMusic21() {
         return music21;
     }
 
+    /**
+     * ログウィンドウに指定の文字を出力します.
+     *
+     * @param ct
+     * @param str
+     */
     public static void log(ConsoleType ct, String str) {
         if (SwingUtilities.isEventDispatchThread()) {
             view.getConsolePane().log(ct, str);
@@ -75,18 +94,38 @@ public class NetSynth {
         }
     }
 
+    /**
+     * ログウィンドウにインフォメーションを出力します.
+     *
+     * @param str
+     */
     public static void logInformation(String str) {
         log(ConsoleType.Information, str);
     }
 
+    /**
+     * ログウィンドウに警告を出力します.
+     *
+     * @param str
+     */
     public static void logWarning(String str) {
         log(ConsoleType.Warning, str);
     }
 
+    /**
+     * ログウィンドウにエラーを出力します.
+     *
+     * @param str
+     */
     public static void logError(String str) {
         log(ConsoleType.Error, str);
     }
 
+    /**
+     * ログウィンドウに例外情報を出力します.
+     *
+     * @param e
+     */
     public static void logException(Exception e) {
         if (view == null) {
             return;
@@ -98,6 +137,11 @@ public class NetSynth {
         }
     }
 
+    /**
+     * ログウィンドウにデバッグ情報を出力します.
+     *
+     * @param str
+     */
     public static void logDebug(String str) {
         log(ConsoleType.Debug, str);
     }
