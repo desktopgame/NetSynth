@@ -8,7 +8,6 @@
  */
 package jp.desktopgame.netsynth.core;
 
-import jp.desktopgame.netsynth.music21.PythonUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import jp.desktopgame.netsynth.music21.PythonUtil;
 import jp.desktopgame.netsynth.sound.SoundDatabase;
 import jp.desktopgame.pec.GetMethod;
 import jp.desktopgame.pec.ListProperty;
@@ -83,8 +83,8 @@ public class GlobalSetting {
     private boolean forcePyenvPath;
 
     @Property("有効なpythonのパス(変更不可能)")
-    @GetMethod
-    private String activePythonPath;
+    @GetMethod("getActivePythonPath")
+    private String ACTIVE_PYTHON_PATH;
 
     @Property("ポート番号")
     @GetMethod
