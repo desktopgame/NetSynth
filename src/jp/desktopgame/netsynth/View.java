@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import jp.desktopgame.netsynth.console.ConsolePane;
+import jp.desktopgame.netsynth.core.AutoGeneratePane;
 import jp.desktopgame.netsynth.core.MidiInputPane;
 import jp.desktopgame.netsynth.core.action.AllLineCloseAction;
 import jp.desktopgame.netsynth.core.action.AudioSliceAction;
@@ -81,6 +82,7 @@ public class View {
     private TrackSettingPane trackSettingPane;
     private WorkAreaPane workAreaPane;
     private ConsolePane consolePane;
+    private AutoGeneratePane autoGeneratePane;
     private ActionTable<View> actionTable;
 
     /* package private */ View() {
@@ -93,12 +95,14 @@ public class View {
         this.bottomPanel = new JPanel(new BorderLayout());
         this.vBar = new SideBar(SideBar.VERTICAL);
         this.midiInputPane = new MidiInputPane();
+        this.autoGeneratePane = new AutoGeneratePane();
         vBar.setView(topPanel);
         vBar.addSlot("Log", bottomPanel);
         this.hBar = new SideBar();
         hBar.setView(vBar);
         hBar.addSlot("Track", leftPanel);
         hBar.addSlot("Input", midiInputPane);
+        hBar.addSlot("AutoGen", autoGeneratePane);
         this.workAreaPane = new WorkAreaPane();
         this.consolePane = new ConsolePane();
         this.actionTable = new ActionTable(this);
