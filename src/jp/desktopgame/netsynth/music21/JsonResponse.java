@@ -32,6 +32,9 @@ public class JsonResponse {
      * @return
      */
     public static <T> Optional<T> fromJson(String json, Class<T> c) {
+        if (json == null) {
+            return Optional.empty();
+        }
         JsonResponse resp = new Gson().fromJson(json, JsonResponse.class);
         if (resp.status != 0) {
             return Optional.empty();
