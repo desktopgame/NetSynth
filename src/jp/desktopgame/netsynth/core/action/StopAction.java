@@ -49,13 +49,13 @@ public class StopAction extends EditorAction implements SequenceListener {
         if (i < 0) {
             return;
         }
-        this.editor = view.getWorkAreaPane().getEditor(i);
+        this.editor = view.getWorkAreaPane().getTrackEditor(i);
         editor.getPianoRollLayerUI().addSequenceListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e, PianoRollEditorPane editor) {
-        view.getWorkAreaPane().stopSequence();
+        view.getWorkAreaPane().getTrackEditorManager().stopSequence();
         editor.getPianoRollLayerUI().setSequencePosition(0);
         view.getAction("PlayAction").setEnabled(true);
         view.getAction("PauseAction").setEnabled(false);

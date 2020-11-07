@@ -99,7 +99,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
         if (!trMap.containsKey(t)) {
             return;
         }
-        NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
+        NetSynth.getView().getWorkAreaPane().getTrackEditorManager().setupMidiPlayer();
         enabledCheckBox.setSelected(trMap.get(t).enabled);
         ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
         ps.getTrackSetting(trMap.get(t).uuid).ifPresent((track) -> {
@@ -114,7 +114,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
 
     private void onSelectTrack(ItemEvent e) {
         getReceiver().ifPresent((r) -> {
-            NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
+            NetSynth.getView().getWorkAreaPane().getTrackEditorManager().setupMidiPlayer();
             ProjectSetting ps = ProjectSetting.Context.getProjectSetting();
             r.uuid = ps.getTrackSetting(trackComboBox.getSelectedIndex()).getUUID();
             r.enabled = enabledCheckBox.isSelected();
@@ -124,7 +124,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
 
     private void onEnabled(ActionEvent e) {
         getReceiver().ifPresent((r) -> {
-            NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
+            NetSynth.getView().getWorkAreaPane().getTrackEditorManager().setupMidiPlayer();
             r.enabled = enabledCheckBox.isSelected();
             r.logInfo();
         });
@@ -151,7 +151,7 @@ public class MidiInputPane extends JPanel implements SlotCallback {
 
     @Override
     public void onShow() {
-        NetSynth.getView().getWorkAreaPane().setupMidiPlayer();
+        NetSynth.getView().getWorkAreaPane().getTrackEditorManager().setupMidiPlayer();
         keyboardComboBoxModel.removeAllElements();
         trackComboBoxModel.removeAllElements();
         enabledCheckBox.setSelected(false);
@@ -304,13 +304,13 @@ public class MidiInputPane extends JPanel implements SlotCallback {
                 if (!keys.contains(height)) {
                     keys.add(height);
                 }
-                NetSynth.getView().getWorkAreaPane().noteOn(ts, height, velocity);
+                NetSynth.getView().getWorkAreaPane().getTrackEditorManager().noteOn(uuid, height, velocity);
             } else if (cmd == ShortMessage.NOTE_OFF || velocity <= 0) {
-                NetSynth.getView().getWorkAreaPane().noteOff(ts, height, velocity);
+                NetSynth.getView().getWorkAreaPane().getTrackEditorManager().noteOff(uuid, height, velocity);
                 keys.remove((Object) height);
             }
             if (track >= 0) {
-                NetSynth.getView().getWorkAreaPane().getEditor(track).getKeyboard().setHighlight(height, sm.getCommand() == ShortMessage.NOTE_ON);
+                NetSynth.getView().getWorkAreaPane().getTrackEditorManager().getEditor(track).getKeyboard().setHighlight(height, sm.getCommand() == ShortMessage.NOTE_ON);
             }
             chordTimer.restart();
         }

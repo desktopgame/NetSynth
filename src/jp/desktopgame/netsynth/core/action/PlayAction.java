@@ -35,9 +35,9 @@ public class PlayAction extends EditorAction {
     @Override
     public void actionPerformed(ActionEvent e, PianoRollEditorPane editor) {
         if (view.getAction("StopAction").isEnabled()) {
-            view.getWorkAreaPane().resumeSequence();
+            view.getWorkAreaPane().getTrackEditorManager().resumeSequence();
         } else {
-            view.getWorkAreaPane().playSequence();
+            view.getWorkAreaPane().getTrackEditorManager().playSequence();
         }
         view.getAction("PauseAction").setEnabled(true);
         view.getAction("StopAction").setEnabled(true);

@@ -46,7 +46,7 @@ public class UndoAction extends EditorAction implements PianoRollModelListener {
             editor.getPianoRoll().getModel().removePianoRollModelListener(this);
         }
         if (i >= 0) {
-            PianoRollEditorPane newEditor = view.getWorkAreaPane().getEditor(i);
+            PianoRollEditorPane newEditor = view.getWorkAreaPane().getTrackEditor(i);
             newEditor.getPianoRoll().getModel().addPianoRollModelListener(this);
             this.editor = newEditor;
         }
@@ -54,7 +54,7 @@ public class UndoAction extends EditorAction implements PianoRollModelListener {
 
     @Override
     protected boolean canExec(int newEditorIndex) {
-        return view.getWorkAreaPane().getEditor(newEditorIndex).getUndoManager().canUndo();
+        return view.getWorkAreaPane().getTrackEditor(newEditorIndex).getUndoManager().canUndo();
     }
 
     @Override

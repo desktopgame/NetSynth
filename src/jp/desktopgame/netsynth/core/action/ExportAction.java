@@ -23,9 +23,9 @@ import static jp.desktopgame.netsynth.NetSynth.logException;
 import static jp.desktopgame.netsynth.NetSynth.logInformation;
 import jp.desktopgame.netsynth.View;
 import jp.desktopgame.netsynth.core.GlobalSetting;
-import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.core.editor.WorkAreaPane;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
+import jp.desktopgame.netsynth.core.project.TrackSetting;
 import jp.desktopgame.netsynth.resources.Resources;
 import jp.desktopgame.prc.MIDI;
 import jp.desktopgame.prc.PianoRollEditorPane;
@@ -57,7 +57,7 @@ public class ExportAction extends ViewAction {
             WorkAreaPane wp = view.getWorkAreaPane();
             for (int i = 0; i < wp.getTrackCount(); i++) {
                 TrackSetting ts = wp.getTrackSetting(i);
-                PianoRollEditorPane editor = wp.getEditor(i);
+                PianoRollEditorPane editor = wp.getTrackEditor(i);
                 PianoRollModel model = editor.getPianoRoll().getModel();
                 List<MidiEvent> events = MIDI.pianoRollModelToMidiEvents(model, i, ps.getTimebase(), ts.getVelocity(), gs.getBeatWidth());
                 Track t = seq.createTrack();
