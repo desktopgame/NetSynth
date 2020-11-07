@@ -130,12 +130,13 @@ public class TrackEditorManager {
         editorList.add(editor);
         editor.getPianoRollLayerUI().setBarStyle(PianoRollLayerUI.BarStyle.PlayOneShot);
         ts.addPropertyChangeListener((pe) -> {
-            if (pe.getPropertyName().equals("isDrum")) {
+            String pnam = pe.getPropertyName();
+            if (pnam.equals("isDrum")) {
                 setupMidiPlayer();
                 editor.getKeyboard().setUseDrumMap((boolean) pe.getNewValue());
-            } else if (pe.getPropertyName().equals("isMute")) {
+            } else if (pnam.equals("isMute") || pnam.equals("bank") || pnam.equals("program")) {
                 setupMidiPlayer();
-            } else if (pe.getPropertyName().equals("autoGenerate")) {
+            } else if (pnam.equals("autoGenerate")) {
                 editor.getPianoRoll().setEditable(!(boolean) pe.getNewValue());
             }
         });
