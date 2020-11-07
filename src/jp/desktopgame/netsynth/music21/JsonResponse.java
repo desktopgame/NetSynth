@@ -36,7 +36,7 @@ public class JsonResponse {
             return Optional.empty();
         }
         JsonResponse resp = new Gson().fromJson(json, JsonResponse.class);
-        if (resp.status != 0) {
+        if (resp == null || resp.status != 0) {
             return Optional.empty();
         }
         return Optional.of(new Gson().fromJson(json, c));
