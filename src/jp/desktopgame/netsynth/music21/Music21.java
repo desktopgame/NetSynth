@@ -50,10 +50,21 @@ public class Music21 {
         }
     }
 
+    /**
+     * サーバーがアクティブであるならtrueを返します.
+     *
+     * @return
+     */
     public boolean isActive() {
         return process != null;
     }
 
+    /**
+     * 指定の音で構成されるコードのコード名を返します.
+     *
+     * @param notes
+     * @return
+     */
     public Future<String> chordName(String... notes) {
         if (process == null) {
             return CompletableFuture.supplyAsync(() -> {
@@ -65,6 +76,11 @@ public class Music21 {
                 .setParameter("json", String.format("{\"command\": \"chord_name\", \"notes\": [%s]}", String.join(",", list))), "GET");
     }
 
+    /**
+     * サーバーを停止します.
+     *
+     * @return
+     */
     public Future<String> kill() {
         if (process == null) {
             return CompletableFuture.supplyAsync(() -> {
