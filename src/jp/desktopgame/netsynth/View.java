@@ -47,6 +47,8 @@ import jp.desktopgame.netsynth.core.action.RedoAction;
 import jp.desktopgame.netsynth.core.action.SaveAction;
 import jp.desktopgame.netsynth.core.action.SaveAsAction;
 import jp.desktopgame.netsynth.core.action.SavePhraseAction;
+import jp.desktopgame.netsynth.core.action.SeekBeginAction;
+import jp.desktopgame.netsynth.core.action.SeekEndAction;
 import jp.desktopgame.netsynth.core.action.SoundAliasAction;
 import jp.desktopgame.netsynth.core.action.SoundDatabaseControlPanelAction;
 import jp.desktopgame.netsynth.core.action.StopAction;
@@ -125,6 +127,8 @@ public class View {
         actionTable.register(PlayAction.class);
         actionTable.register(PauseAction.class);
         actionTable.register(StopAction.class);
+        actionTable.register(SeekBeginAction.class);
+        actionTable.register(SeekEndAction.class);
         actionTable.register(LineConnectAction.class);
         actionTable.register(AllLineCloseAction.class);
         actionTable.register(EasyRecAction.class);
@@ -197,6 +201,9 @@ public class View {
         toolBar.add(createToolButton(getAction("PlayAction")));
         toolBar.add(createToolButton(getAction("PauseAction")));
         toolBar.add(createToolButton(getAction("StopAction")));
+        toolBar.addSeparator();
+        toolBar.add(createToolButton(getAction("SeekBeginAction")));
+        toolBar.add(createToolButton(getAction("SeekEndAction")));
 
         menuBar.add(fileMenu);
         menuBar.add(editMenu);

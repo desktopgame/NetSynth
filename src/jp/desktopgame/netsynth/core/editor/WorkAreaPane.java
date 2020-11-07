@@ -171,6 +171,7 @@ public class WorkAreaPane extends JPanel {
             editorManager.removeEditor(i);
             tabbedPane.remove(i);
             trackListModel.removeElementAt(i);
+            fireTrackChange();
         }
     }
 
