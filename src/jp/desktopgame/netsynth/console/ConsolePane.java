@@ -41,24 +41,50 @@ public class ConsolePane extends JPanel {
         add(tabbedPane, BorderLayout.CENTER);
     }
 
+    /**
+     * ログウィンドウに指定の文字を出力します.
+     *
+     * @param ct
+     * @param str
+     */
     public void log(ConsoleType ct, String str) {
         tabbedPane.setSelectedIndex(ct.ordinal());
         getTextArea(ct).append(str);
         getTextArea(ct).append(System.lineSeparator());
     }
 
+    /**
+     * ログウィンドウにインフォメーションを出力します.
+     *
+     * @param str
+     */
     public void logInformation(String str) {
         log(ConsoleType.Information, str);
     }
 
+    /**
+     * ログウィンドウに警告を出力します.
+     *
+     * @param str
+     */
     public void logWarning(String str) {
         log(ConsoleType.Warning, str);
     }
 
+    /**
+     * ログウィンドウにエラーを出力します.
+     *
+     * @param str
+     */
     public void logError(String str) {
         log(ConsoleType.Error, str);
     }
 
+    /**
+     * ログウィンドウに例外情報を出力します.
+     *
+     * @param e
+     */
     public void logException(Exception e) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -67,6 +93,11 @@ public class ConsolePane extends JPanel {
         log(ConsoleType.Exception, sw.toString());
     }
 
+    /**
+     * ログウィンドウにデバッグ情報を出力します.
+     *
+     * @param str
+     */
     public void logDebug(String str) {
         log(ConsoleType.Debug, str);
     }
