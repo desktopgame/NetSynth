@@ -15,9 +15,7 @@ import java.util.stream.Collectors;
 import javax.sound.midi.Receiver;
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 import jp.desktopgame.netsynth.NetSynth;
-import jp.desktopgame.netsynth.core.action.AutoRecTask;
 import jp.desktopgame.netsynth.midi.MidiDeviceController;
 import jp.desktopgame.netsynth.midi.MidiDeviceManager;
 import jp.desktopgame.netsynth.mixer.DataLineConnection;
@@ -31,23 +29,32 @@ import jp.desktopgame.pec.builder.TextFieldHelper;
  *
  * @author desktopgame
  */
-public class AutoRecDialog extends JPanel {
+public class AutoRecDialog {
 
     private Action action;
     private List<DataLineConnection> connections;
     private List<MidiDeviceController> controllers;
 
-    public AutoRecDialog(Action action) {
+    private AutoRecDialog(Action action) {
         this.action = action;
         this.connections = DataLineConnection.getConnections().stream().filter((e) -> e.isTargetDataLine()).collect(Collectors.toList());
         this.controllers = MidiDeviceManager.getInstance().getDeviceControllers().stream().filter((e) -> e.getReceiver().isPresent()).collect(Collectors.toList());
     }
 
-    public void showDialog() {
+    /**
+     * 自動録音ダイアログを表示します.指定のアクションは録音が終了するまで無効化されます。
+     *
+     * @param a
+     */
+    public static void showDialog(Action a) {
+        new AutoRecDialog(a)._showDialog();
+    }
+
+    private void _showDialog() {
         PropertyEditorBuilder pb = new PropertyEditorBuilder();
         ComboBoxHelper<String> targetLines = pb.comboBox("ターゲットライン").overwrite((Object[]) connections.stream().map((e) -> e.getUniqueName()).toArray(String[]::new));
         ComboBoxHelper<String> receivers = pb.comboBox("MIDIレシーバー").overwrite((Object[]) controllers.stream().map((e) -> e.getAlias()).toArray(String[]::new));
-        IntegerSpinnerHelper velocity = pb.intSpinner("ベロシティ").range(0, 0, 127, 1);
+        IntegerSpinnerHelper velocity = pb.intSpinner("ベロシティ").range(100, 0, 127, 1);
         IntegerSpinnerHelper seconds = pb.intSpinner("秒数").range(1, 0, 100, 1);
         TextFieldHelper outputDir = pb.textField("出力フォルダ").overwrite("AutoRec");
         JButton start = pb.footer(new JButton("開始"));
@@ -74,7 +81,7 @@ public class AutoRecDialog extends JPanel {
             if (!dir.exists()) {
                 dir.mkdir();
             }
-            setEnabled(false);
+            //setEnabled(false);
             start.setEnabled(false);
             new AutoRecTask(dir, dlc, receiver, velocity.current(), seconds.current(), start, action).execute();
         });

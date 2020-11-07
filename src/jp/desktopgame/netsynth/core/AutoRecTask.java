@@ -6,7 +6,7 @@
  * This software is released under the MIT License.
  * http://opensource.org/licenses/mit-license.php
  */
-package jp.desktopgame.netsynth.core.action;
+package jp.desktopgame.netsynth.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,11 +21,7 @@ import jp.desktopgame.netsynth.NetSynth;
 import jp.desktopgame.netsynth.mixer.DataLineConnection;
 import jp.desktopgame.prc.Keyboard;
 
-/**
- *
- * @author desktopgame
- */
-public class AutoRecTask extends SwingWorker<Void, Void> {
+class AutoRecTask extends SwingWorker<Void, Void> {
 
     private File dir;
     private DataLineConnection dataLineConnection;
