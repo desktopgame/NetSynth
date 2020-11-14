@@ -18,6 +18,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+import jp.desktopgame.netsynth.NetSynth;
 import static jp.desktopgame.netsynth.NetSynth.logException;
 import jp.desktopgame.netsynth.View;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
@@ -62,7 +63,7 @@ public class SaveAsAction extends ViewAction {
             }
         });
         fc.setSelectedFile(new File(name + ".json"));
-        if (fc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (fc.showSaveDialog(NetSynth.getView().getFrame()) == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             try {
                 ProjectSetting.Context.getInstance().saveAs(file.getPath());

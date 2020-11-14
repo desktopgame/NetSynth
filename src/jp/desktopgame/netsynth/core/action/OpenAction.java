@@ -16,6 +16,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
+import jp.desktopgame.netsynth.NetSynth;
 import static jp.desktopgame.netsynth.NetSynth.logException;
 import jp.desktopgame.netsynth.View;
 import jp.desktopgame.netsynth.core.project.ProjectSetting;
@@ -52,7 +53,7 @@ public class OpenAction extends ViewAction {
                 return "*.json";
             }
         });
-        if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+        if (fc.showOpenDialog(NetSynth.getView().getFrame()) == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
             try {
                 ProjectSetting.Context.getInstance().open(file.getPath());
