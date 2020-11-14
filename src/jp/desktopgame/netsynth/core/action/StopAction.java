@@ -64,7 +64,7 @@ public class StopAction extends EditorAction implements SequenceListener {
 
     @Override
     public void sequenceUpdate(SequenceEvent e) {
-        if (isEnabled() && e.getNewPosition() == 0) {
+        if (isEnabled() && e.getType() == SequenceEvent.Type.Reset) {
             setEnabled(false);
             view.getAction("PauseAction").setEnabled(false);
             view.getAction("PlayAction").setEnabled(true);
