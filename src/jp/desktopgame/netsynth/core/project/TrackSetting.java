@@ -17,6 +17,7 @@ import jp.desktopgame.pec.Property;
 import jp.desktopgame.pec.Separator;
 import jp.desktopgame.pec.SetMethod;
 import jp.desktopgame.prc.PianoRollModel;
+import jp.desktopgame.prc.RegionManager;
 
 /**
  * トラックごとの設定を保存するクラスです.
@@ -69,6 +70,9 @@ public class TrackSetting {
 
     @Expose
     private PianoRollModel model;
+
+    @Expose
+    private RegionManager regionManager;
 
     @Expose
     private String uuid;
@@ -183,6 +187,14 @@ public class TrackSetting {
 
     public PianoRollModel getModel() {
         return model;
+    }
+
+    public void setRegionManager(RegionManager regionManager) {
+        this.regionManager = regionManager;
+    }
+
+    public RegionManager getRegionManager() {
+        return regionManager;
     }
 
     /**

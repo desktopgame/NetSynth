@@ -32,6 +32,7 @@ import jp.desktopgame.prc.PianoRollGroup;
 import jp.desktopgame.prc.PianoRollLayerUI;
 import jp.desktopgame.prc.PianoRollModel;
 import jp.desktopgame.prc.PianoRollModelEvent;
+import jp.desktopgame.prc.Region;
 import jp.desktopgame.prc.UpdateRate;
 import jp.desktopgame.stask.SwingTask;
 
@@ -146,6 +147,12 @@ public class TrackEditorManager {
         } else {
             editor.getPianoRoll().setModel(ts.getModel());
         }
+        if (ts.getRegionManager() != null) {
+            for (Region r : ts.getRegionManager().getRegions()) {
+                editor.getPianoRoll().getRegionManager().addRegion(new Region(r.getStartOffset(), r.getEndOffset(), r.getLoopCount()));
+            }
+        }
+        ts.setRegionManager(editor.getPianoRoll().getRegionManager());
         editor.getPianoRoll().setEditable(!ts.isAutoGenerate());
         editor.getPianoRoll().getModel().addPianoRollModelListener((pe) -> onModelUpdate(editor, pe));
         syncGlobalSetting(editor);

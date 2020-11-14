@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.event.EventListenerList;
 import jp.desktopgame.netsynth.core.PianoRollModelTypeAdapter;
+import jp.desktopgame.netsynth.core.RegionManagerTypeAdapter;
 import jp.desktopgame.pec.GetMethod;
 import jp.desktopgame.pec.Property;
 import jp.desktopgame.pec.SetMethod;
 import jp.desktopgame.prc.PianoRollModel;
+import jp.desktopgame.prc.RegionManager;
 
 /**
  * プロジェクトの設定情報.
@@ -300,6 +302,7 @@ public class ProjectSetting {
         public void open(File file) throws FileNotFoundException {
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(PianoRollModel.class, new PianoRollModelTypeAdapter())
+                    .registerTypeAdapter(RegionManager.class, new RegionManagerTypeAdapter())
                     .excludeFieldsWithoutExposeAnnotation()
                     .create();
             setting.removeAllTrackSetting();
@@ -331,6 +334,7 @@ public class ProjectSetting {
         public void saveAs(String file) throws IOException {
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(PianoRollModel.class, new PianoRollModelTypeAdapter())
+                    .registerTypeAdapter(RegionManager.class, new RegionManagerTypeAdapter())
                     .excludeFieldsWithoutExposeAnnotation()
                     .create();
             try ( FileWriter fw = new FileWriter(file)) {
